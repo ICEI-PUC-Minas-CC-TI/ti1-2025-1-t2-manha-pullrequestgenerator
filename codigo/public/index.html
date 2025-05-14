@@ -1,21 +1,161 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Chat com OpenAI + jQuery</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jQuery via CDN -->
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+    crossorigin="anonymous"></script>
+
 </head>
 
-<body>
-
-    <div>
-        <h1 class="text-3xl font-bold underline">
-            Hello world!
-        </h1>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+    <div id="chatWindow" class="flex-1 overflow-y-auto space-y-4 mb-4">
+      <!-- Mensagens serão inseridas aqui -->
     </div>
+    <form id="chatForm" class="flex">
+      <input id="userInput" type="text" placeholder="Digite sua mensagem..."
+        class="flex-1 border border-gray-300 rounded-l-2xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <button type="submit"
+        class="bg-blue-500 text-white rounded-r-2xl px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        Enviar
+      </button>
+    </form>
+  </div>
 
+  <script>
+    function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
+      return {
+        apiKey,
+        model: defaultModel,
+        messages: [],
+
+        setModel(newModel) {
+          this.model = newModel;
+        },
+
+        addMessage(role, content) {
+          this.messages.push({ role, content });
+        },
+
+        clearMessages() {
+          this.messages = [];
+        },
+
+        async send() {
+          const url = "https://api.openai.com/v1/chat/completions";
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${this.apiKey}`
+            },
+            body: JSON.stringify({
+              model: this.model,
+              messages: this.messages
+            })
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`OpenAI API error (${response.status}): ${errorText}`);
+          }
+
+          return await response.json();
+        }
+      };
+    }
+    const connector = createOpenAIConnector('API_KEY');
+
+    const ChatApp = {
+      chats: JSON.parse(localStorage.getItem('chats') || '[]'),
+      currentChatId: null,
+      saveChat() {
+        localStorage.setItem('chats', JSON.stringify(this.chats));
+      },
+      openChat(chatId) {
+        const chat = this.chats.find(c => c.id === chatId);
+        if (!chat) return;
+        this.currentChatId = chatId;
+        this.clearMessages();
+        // set connector model and messages
+        connector.clearMessages();
+        connector.setModel(chat.model);
+        connector.messages = [...chat.messages];
+        chat.messages.forEach(m => this.appendMessage(m.role, m.content));
+      },
+      appendMessage(role, content) {
+        const $msg = $('<div>').text(content)
+          .addClass(role === 'assistant'
+            ? 'bg-gray-200 text-gray-800 rounded-xl p-3 self-start max-w-[80%]'
+            : 'bg-blue-500 text-white rounded-xl p-3 self-end max-w-[80%]');
+        $('#chatWindow').append($msg);
+        $('#chatWindow').scrollTop($('#chatWindow')[0].scrollHeight);
+        // update state and persist
+        if (this.currentChatId) {
+          const chat = this.chats.find(c => c.id === this.currentChatId);
+          chat.messages.push({ role, content });
+          this.saveChat();
+        }
+      },
+      clearMessages() {
+        $('#chatWindow').empty();
+      }
+    };
+
+
+    $(document).ready(function () {
+
+      // Try to load chatId from URL query parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const chatIdParam = urlParams.get('chatId');
+
+      if (chatIdParam && ChatApp.chats.some(c => c.id === chatIdParam)) {
+        // Open specified chat from URL
+        ChatApp.openChat(chatIdParam);
+      } else {
+        // No valid chatId in URL - ensure at least one chat exists
+        if (ChatApp.chats.length === 0) {
+          const newChat = { id: Date.now().toString(), model: connector.model, messages: [] };
+          ChatApp.chats.push(newChat);
+          ChatApp.saveChat();
+        }
+        // Open the most recent chat
+        ChatApp.openChat(ChatApp.chats[ChatApp.chats.length - 1].id);
+        connector.addMessage('system', 'Você é um assistente simpático.');
+      }
+
+
+      const $chatWindow = $('#chatWindow');
+      const $chatForm = $('#chatForm');
+      const $userInput = $('#userInput');
+
+      $chatForm.on('submit', async function (e) {
+        e.preventDefault();
+        const text = $userInput.val().trim();
+        if (!text) return;
+
+        ChatApp.appendMessage('user', text);
+        connector.addMessage('user', text);
+        $userInput.val('');
+
+        try {
+          const response = await connector.send();
+          const reply = response.choices[0].message.content;
+          ChatApp.appendMessage('assistant', reply);
+          connector.addMessage('assistant', reply);
+        } catch (err) {
+          console.error(err);
+          ChatApp.appendMessage('assistant', 'Ocorreu um erro ao obter a resposta.');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>
