@@ -1,25 +1,18 @@
 {
-  "usuarios": [
+  "users": [
     {
       "id": 1,
-      "login": "admin",
-      "senha": "123",
-      "nome": "Administrador do Sistema",
-      "email": "admin@abc.com"
-    },
+      "name": "Heitor Lima Moreira",
+      "email": "heitorlmoreira@gmail.com",
+      "session": "15901u590uurjakrj904239",
+      "session_expires_at": "2025-05-16T12:32:44.252Z"
+    }
+  ],
+  "chats": [
     {
-      "id": 2,
-      "login": "user",
-      "senha": "123",
-      "nome": "Usuario Comum",
-      "email": "user@abc.com"
-    },
-    {
-      "login": "rommel",
-      "senha": "123",
-      "nome": "Rommel",
-      "email": "rommel@gmail.com",
-      "id": 3
+      "id": 1,
+      "owner": 1,
+      "messages": [{}]
     }
   ]
 }
