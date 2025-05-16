@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pull Request Generator App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./assets/js/openai.js"></script>
+    <script src="./assets/js/useState.js"></script>
+    <script src="./assets/js/generateUUID.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+
+<body class="bg-white min-h-screen flex flex-col">
+    <nav class="w-full shadow-sm px-6 py-4 bg-white flex justify-between items-center">
+        <h1 class="text-xl font-semibold text-blue-600">Pull Request Generator</h1>
+        <a href="/login" class="text-white bg-blue-600 px-4 py-2 rounded">Login</a>
+    </nav>
+
+    <main class="flex-1 flex justify-center items-start py-10 px-4">
+        <div id="chat-container" class="w-full max-w-3xl bg-gray-50 shadow-md rounded-lg p-6 flex flex-col space-y-4">
+            <div id="chat-messages" class="flex flex-col space-y-2 overflow-y-auto max-h-[70vh]"></div>
+
+            <form id="chat-form" class="flex space-x-2">
+                <input type="text" id="chat-input" class="flex-1 border rounded px-4 py-2 focus:outline-none"
+                    placeholder="Digite sua mensagem...">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Enviar</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="text-center text-sm text-gray-500 py-6">
+        © 2025 Pull Request Generator. Todos os direitos reservados.
+    </footer>
+
+    <script>
+        const chatStore = window.useState();
+        const chatKey = 'chat-messages';
+        const openaiConnector = window.createOpenAIConnector('API_KEY_HERE');
+
+        const ChatState = {
+            get messages() {
+                return chatStore.getState(chatKey) || [];
+            },
+            addMessage(role, content) {
+                const id = window.generateUUID();
+                const newMessage = { id, role, content };
+                const updatedMessages = [...this.messages, newMessage];
+                chatStore.setState(chatKey, updatedMessages);
+                ChatRenderer.render();
+            },
+            hydrate(messages) {
+                chatStore.setState(chatKey, messages);
+            },
+            clear() {
+                chatStore.setState(chatKey, []);
+            }
+        };
+
+        const ChatRenderer = {
+            render() {
+                const container = $('#chat-messages');
+                container.empty();
+
+                ChatState.messages.forEach(msg => {
+                    const messageClass = msg.role === 'user'
+                        ? 'bg-blue-100 self-end text-right'
+                        : 'bg-gray-200 self-start text-left';
+
+                    const message = $(`
+                    <div id="message-${msg.id}" class="rounded-lg px-4 py-2 ${messageClass} max-w-[80%]">
+                        <p class="text-sm">${msg.content}</p>
+                    </div>
+                `);
+                    container.append(message);
+                });
+
+                if (ChatState.messages.at(-1)?.role === 'assistant') {
+                    this.renderFeedbackForm(container);
+                }
+
+                container.scrollTop(container[0].scrollHeight);
+            },
+
+            renderFeedbackForm(container) {
+                const form = $(`
+                <div id="feedback-form" class="flex flex-col items-start space-y-2 p-4 bg-white border rounded shadow">
+                    <p class="text-sm text-gray-700">Gostou da descrição gerada pelo assistente? Sinta-se livre para pedir alterações.</p>
+                    <div class="flex space-x-2">
+                        <button id="send-feedback" class="bg-blue-600 text-white px-3 py-1 rounded text-sm">Enviar</button>
+                        <button id="cancel-feedback" class="bg-gray-300 text-black px-3 py-1 rounded text-sm">Cancelar</button>
+                    </div>
+                </div>
+            `);
+                container.append(form);
+            }
+        };
+
+        // Inicializa a UI com mensagens persistidas
+        const existingMessages = chatStore.getState(chatKey);
+        if (Array.isArray(existingMessages)) {
+            ChatState.hydrate(existingMessages);
+        } else {
+            ChatState.hydrate([]);
+        }
+        ChatRenderer.render();
+
+        $('#chat-form').on('submit', function (e) {
+            e.preventDefault();
+            $('#feedback-form').remove();
+            const userMsg = $('#chat-input').val().trim();
+            if (!userMsg) return;
+
+            ChatState.addMessage('user', userMsg);
+            $('#chat-input').val('');
+
+            // Simula resposta do assistant
+            setTimeout(() => {
+                ChatState.addMessage('assistant', 'Simulação de resposta do assistente.');
+            }, 600);
+        });
+
+        $('#chat-messages').on('click', '#cancel-feedback', function () {
+            $('#feedback-form').remove();
+        });
+
+        $('#chat-messages').on('click', '#send-feedback', function () {
+            alert('Feedback enviado!');
+            $('#feedback-form').remove();
+        });
+    </script>
+</body>
+
+</html>
