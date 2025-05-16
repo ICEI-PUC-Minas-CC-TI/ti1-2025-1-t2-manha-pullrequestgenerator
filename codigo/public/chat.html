@@ -41,6 +41,8 @@
         const chatKey = 'chat-messages';
         const openaiConnector = window.createOpenAIConnector('API_KEY_HERE');
 
+        openaiConnector.setModel("gpt-4o-mini");
+
         const ChatState = {
             get messages() {
                 return chatStore.getState(chatKey) || [];
@@ -51,12 +53,36 @@
                 const updatedMessages = [...this.messages, newMessage];
                 chatStore.setState(chatKey, updatedMessages);
                 ChatRenderer.render();
+
+                return id;
             },
             hydrate(messages) {
                 chatStore.setState(chatKey, messages);
             },
             clear() {
                 chatStore.setState(chatKey, []);
+            },
+            updateMessage(id, chunck) {
+                const messages = this.messages;
+
+                const message = messages.find(c => c.id == id);
+
+                if (!message) {
+                    throw new Error('Client error: cannot update a undefined message');
+                }
+
+                message.content = message.content + chunck;
+
+
+                this.hydrate(messages.map(c => {
+                    if (c.id == id) {
+                        return message;
+                    }
+
+                    return c;
+                }))
+
+                ChatRenderer.render();
             }
         };
 
@@ -108,7 +134,7 @@
         }
         ChatRenderer.render();
 
-        $('#chat-form').on('submit', function (e) {
+        $('#chat-form').on('submit', async function (e) {
             e.preventDefault();
             $('#feedback-form').remove();
             const userMsg = $('#chat-input').val().trim();
@@ -117,10 +143,17 @@
             ChatState.addMessage('user', userMsg);
             $('#chat-input').val('');
 
-            // Simula resposta do assistant
-            setTimeout(() => {
-                ChatState.addMessage('assistant', 'Simulação de resposta do assistente.');
-            }, 600);
+            const respId = ChatState.addMessage('assistant', '');
+
+            await openaiConnector.send(respId, (msgId, chunck) => {
+                ChatState.updateMessage(msgId, chunck)
+            }, [
+                ...ChatState.messages,
+                {
+                    role: "user",
+                    content: userMsg,
+                }
+            ])
         });
 
         $('#chat-messages').on('click', '#cancel-feedback', function () {

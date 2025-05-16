@@ -35,34 +35,52 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
       this.messages = [];
     },
 
-    /**
-     * Send the accumulated messages to the OpenAI API.
-     * @returns {Promise<Object>} - The API response.
-     * @throws {Error} - On HTTP or network errors.
-     */
-    async send() {
-      const url = "https://api.openai.com/v1/chat/completions";
-      const response = await fetch(url, {
+    async send(msgId, callback, messages) {
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${this.apiKey}`
+          Authorization: `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
           model: this.model,
-          messages: this.messages
-        })
+          stream: true,
+          messages: messages ? messages :this.messages,
+        }),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`OpenAI API error (${response.status}): ${errorText}`);
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        let sep;
+        while ((sep = buffer.indexOf("\n\n")) !== -1) {
+          const raw = buffer.slice(0, sep).trim();
+          buffer = buffer.slice(sep + 2);
+
+          raw.split("\n").forEach((line) => {
+            const m = line.match(/^data:\s*(.*)$/);
+            if (!m) return;
+
+            const payload = m[1];
+            if (payload === "[DONE]") return;
+
+            const json = JSON.parse(payload);
+            const delta = json.choices?.[0]?.delta;
+            if (delta?.content) {
+              callback(msgId, delta.content);
+            }
+          });
+        }
       }
-
-      return await response.json();
-    }
+    },
   };
-};
-
+}
 
 window.createOpenAIConnector = createOpenAIConnector;
