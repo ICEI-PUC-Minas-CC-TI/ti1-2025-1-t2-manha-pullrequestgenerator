@@ -1,60 +1,90 @@
-// Valida o formulário antes de adicionar ou atualizar
-function validateForm() {
-    const organizacao = document.getElementById("organizacao").value.trim();
-    const repositorio = document.getElementById("repositorio").value.trim();
-    const branch_base = document.getElementById("branch_base").value.trim();
-    const branch_comparacao = document.getElementById("branch_comparacao").value.trim();
+$(document).ready(function () {
+    showData();
 
-    if (!organizacao || !repositorio || !branch_base || !branch_comparacao) {
-        alert("Todos os campos devem ser preenchidos.");
-        return false;
-    }
+    // Carrega organizações ao iniciar
+    $('#githubToken').on('change', function () {
+        fetchOrganizations();
+    });
 
-    return true;
-}
+    // Popula repositórios ao selecionar uma organização
+    $('#organizacao').on('change', function () {
+        fetchRepos();
+    });
+
+    // Função de autocompletar para repositórios
+    $("#repositorio").autocomplete({
+        minLength: 0,
+        source: function (request, response) {
+            // Busca em qualquer posição na string, não apenas no início
+            const results = $.grep(allRepos, function (repo) {
+                return repo.toLowerCase().includes(request.term.toLowerCase());
+            });
+            response(results.slice(0, 10)); // Limita a 10 resultados
+        },
+        select: function (event, ui) {
+            $("#repositorio").val(ui.item.value);
+            fetchBranches(); // Carregar branches após selecionar um repositório
+            return false;
+        }
+    }).focus(function () {
+        $(this).autocomplete("search", "");
+    });
+
+    // Função de autocompletar para branches
+    $("#branch_base, #branch_comparacao").autocomplete({
+        minLength: 0,
+        source: function (request, response) {
+            const results = $.grep(allBranches, function (branch) {
+                return branch.toLowerCase().includes(request.term.toLowerCase());
+            });
+            response(results.slice(0, 10)); // Limita a 10 resultados
+        }
+    }).focus(function () {
+        $(this).autocomplete("search", "");
+    });
+});
+
+// Arrays globais para armazenar os dados
+let allRepos = [];
+let allBranches = [];
 
 // Exibe os dados salvos
 function showData() {
-    let peopleList = localStorage.getItem("peopleList")
+    const peopleList = localStorage.getItem("peopleList")
         ? JSON.parse(localStorage.getItem("peopleList"))
         : [];
 
-    let html = "";
+    let html = '';
 
     peopleList.forEach((element, index) => {
-        html += "<tr>";
-        html += `<td>${element.organizacao}</td>`;
-        html += `<td>${element.repositorio}</td>`;
-        html += `<td>${element.branch_base}</td>`;
-        html += `<td>${element.branch_comparacao}</td>`;
-        html += `<td>
-                    <button onclick="deleteData(${index})" class="btn btn-danger">Excluir</button>
-                    <button onclick="updateData(${index})" class="btn btn-warning">Editar</button>
-                 </td>`;
-        html += "</tr>";
+        html += `<tr>
+                    <td>${element.organizacao}</td>
+                    <td>${element.repositorio}</td>
+                    <td>${element.branch_base}</td>
+                    <td>${element.branch_comparacao}</td>
+                    <td>
+                        <button onclick="deleteData(${index})" class="btn btn-danger">Excluir</button>
+                        <button onclick="updateData(${index})" class="btn btn-warning">Editar</button>
+                    </td>
+                 </tr>`;
     });
 
-    document.querySelector("#crudTable tbody").innerHTML = html;
+    $("#crudTable tbody").html(html);
 }
 
 // Adiciona novo dado
 function addData() {
     if (validateForm()) {
-        const organizacao = document.getElementById("organizacao").value;
-        const repositorio = document.getElementById("repositorio").value;
-        const branch_base = document.getElementById("branch_base").value;
-        const branch_comparacao = document.getElementById("branch_comparacao").value;
+        const organizacao = $("#organizacao").val();
+        const repositorio = $("#repositorio").val();
+        const branch_base = $("#branch_base").val();
+        const branch_comparacao = $("#branch_comparacao").val();
 
-        let peopleList = localStorage.getItem("peopleList")
+        const peopleList = localStorage.getItem("peopleList")
             ? JSON.parse(localStorage.getItem("peopleList"))
             : [];
 
-        peopleList.push({
-            organizacao,
-            repositorio,
-            branch_base,
-            branch_comparacao,
-        });
+        peopleList.push({ organizacao, repositorio, branch_base, branch_comparacao });
 
         localStorage.setItem("peopleList", JSON.stringify(peopleList));
         clearForm();
@@ -64,7 +94,7 @@ function addData() {
 
 // Exclui dado pelo índice
 function deleteData(index) {
-    let peopleList = JSON.parse(localStorage.getItem("peopleList"));
+    const peopleList = JSON.parse(localStorage.getItem("peopleList"));
     peopleList.splice(index, 1);
     localStorage.setItem("peopleList", JSON.stringify(peopleList));
     showData();
@@ -72,40 +102,113 @@ function deleteData(index) {
 
 // Atualiza um item
 function updateData(index) {
-    document.getElementById("Submit").style.display = "none";
-    document.getElementById("Update").style.display = "inline-block";
+    $("#Submit").hide();
+    $("#Update").show();
 
-    let peopleList = JSON.parse(localStorage.getItem("peopleList"));
+    const peopleList = JSON.parse(localStorage.getItem("peopleList"));
 
-    document.getElementById("organizacao").value = peopleList[index].organizacao;
-    document.getElementById("repositorio").value = peopleList[index].repositorio;
-    document.getElementById("branch_base").value = peopleList[index].branch_base;
-    document.getElementById("branch_comparacao").value = peopleList[index].branch_comparacao;
+    $("#organizacao").val(peopleList[index].organizacao);
+    $("#repositorio").val(peopleList[index].repositorio);
+    $("#branch_base").val(peopleList[index].branch_base);
+    $("#branch_comparacao").val(peopleList[index].branch_comparacao);
 
-    document.getElementById("Update").onclick = function () {
+    $("#Update").off('click').on('click', function () {
         if (validateForm()) {
-            peopleList[index].organizacao = document.getElementById("organizacao").value;
-            peopleList[index].repositorio = document.getElementById("repositorio").value;
-            peopleList[index].branch_base = document.getElementById("branch_base").value;
-            peopleList[index].branch_comparacao = document.getElementById("branch_comparacao").value;
+            peopleList[index].organizacao = $("#organizacao").val();
+            peopleList[index].repositorio = $("#repositorio").val();
+            peopleList[index].branch_base = $("#branch_base").val();
+            peopleList[index].branch_comparacao = $("#branch_comparacao").val();
 
             localStorage.setItem("peopleList", JSON.stringify(peopleList));
             clearForm();
             showData();
 
-            document.getElementById("Submit").style.display = "inline-block";
-            document.getElementById("Update").style.display = "none";
+            $("#Submit").show();
+            $("#Update").hide();
         }
-    };
+    });
 }
 
 // Limpa o formulário após submit ou update
 function clearForm() {
-    document.getElementById("organizacao").value = "";
-    document.getElementById("repositorio").value = "";
-    document.getElementById("branch_base").value = "";
-    document.getElementById("branch_comparacao").value = "";
+    $("#organizacao, #repositorio, #branch_base, #branch_comparacao").val("");
 }
 
-// Carrega dados ao abrir a página
-window.onload = showData;
+// Funções para integrações com a API do GitHub
+function fetchOrganizations() {
+    const token = $('#githubToken').val().trim();
+
+    console.log('Token:', token); // Para verificar se o token está sendo capturado
+
+    $.ajax({
+        url: 'https://api.github.com/user/orgs',
+        headers: { 'Authorization': 'token ' + token }
+    })
+        .done(function (data) {
+            console.log('Organizações recebidas:', data); // Log para ver o que foi retornado
+            const orgSelect = $('#organizacao');
+            orgSelect.html('<option value="">Selecione a organização</option>');
+            data.forEach(org => {
+                orgSelect.append(`<option value="${org.login}">${org.login}</option>`);
+            });
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            console.error('Erro ao carregar organizações:', textStatus, errorThrown);
+        });
+}
+
+function fetchRepos() {
+    const token = $('#githubToken').val().trim();
+    const org = $('#organizacao').val().trim();
+
+    if (!org) return;
+
+    $.ajax({
+        url: `https://api.github.com/orgs/${org}/repos`,
+        headers: { 'Authorization': 'token ' + token }
+    })
+        .done(function (data) {
+            allRepos = data.map(repo => repo.name);
+            $("#repositorio").autocomplete("option", "source", allRepos);
+            $("#repositorio").val(''); // Limpa campo de repositório quando carregar novos
+        })
+        .fail(function () {
+            console.error('Erro ao carregar repositórios');
+        });
+}
+
+function fetchBranches() {
+    const token = $('#githubToken').val().trim();
+    const org = $('#organizacao').val().trim();
+    const repo = $('#repositorio').val().trim();
+
+    if (!org || !repo) return;
+
+    $.ajax({
+        url: `https://api.github.com/repos/${org}/${repo}/branches`,
+        headers: { 'Authorization': 'token ' + token }
+    })
+        .done(function (data) {
+            allBranches = data.map(branch => branch.name);
+            $("#branch_base, #branch_comparacao").autocomplete("option", "source", allBranches);
+            $("#branch_base, #branch_comparacao").val(''); // Limpa campos de branch quando carregar novos
+        })
+        .fail(function () {
+            console.error('Erro ao carregar branches');
+        });
+}
+
+// Valida o formulário antes de adicionar ou atualizar 
+function validateForm() {
+    const organizacao = $("#organizacao").val().trim();
+    const repositorio = $("#repositorio").val().trim();
+    const branch_base = $("#branch_base").val().trim();
+    const branch_comparacao = $("#branch_comparacao").val().trim();
+
+    if (!organizacao || !repositorio || !branch_base || !branch_comparacao) {
+        alert("Todos os campos devem ser preenchidos.");
+        return false;
+    }
+
+    return true;
+}
