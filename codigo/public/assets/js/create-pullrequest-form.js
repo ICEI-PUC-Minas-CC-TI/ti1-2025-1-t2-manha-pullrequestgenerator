@@ -175,7 +175,7 @@ async function loadRepositories(org) {
 
         if (org === username) {
             // Fetch personal repos
-            repos = await githubFetch(`https://api.github.com/user/repos?per_page=100`);
+            repos = await githubFetch(`https://api.github.com/users/${username}/repos?per_page=100`);
         } else {
             // Fetch organization repos
             repos = await githubFetch(`https://api.github.com/orgs/${org}/repos?per_page=100`);
