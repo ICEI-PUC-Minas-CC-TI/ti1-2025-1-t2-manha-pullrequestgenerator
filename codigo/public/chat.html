@@ -48,6 +48,8 @@
             const chatKey = 'chat-messages';
             const openaiConnector = window.createOpenAIConnector('API_KEY_HERE');
 
+            let job = {};
+
             openaiConnector.setModel("gpt-4o-mini");
 
             const ChatState = {
@@ -152,26 +154,33 @@
 
                 const jobsProcessor = window.newJobsProcessor(chatStore, githubClient);
 
-                const commits = await jobsProcessor.processNextJob();
+                const queue = chatStore.getState("queue");
 
-                const commitsData = commits.map((d) => {
-                    return JSON.stringify(d)
-                });
+                if (queue.length > 0) {
+                    job = queue[queue.length - 1];
 
-                const prompt = `Gerar uma descrição de pull request a partir das seguintes mensagens de commit:\n\n${commitsData.join(
-                    "\n",
-                )}`;
 
-                ChatState.addContextMessage("system", window.basePrompt());
-                ChatState.addContextMessage("user", prompt);
+                    const commits = await jobsProcessor.processNextJob();
 
-                const assistantRespId = ChatState.addMessage("assistant", " ");
+                    const commitsData = commits.map((d) => {
+                        return JSON.stringify(d)
+                    });
 
-                await openaiConnector.send(assistantRespId, (msgId, chunck) => {
-                    ChatState.updateMessage(msgId, chunck)
-                }, [
-                    ...ChatState.messages.map(c => ({ role: c.role, content: c.content })),
-                ])
+                    const prompt = `Gerar uma descrição de pull request a partir das seguintes mensagens de commit:\n\n${commitsData.join(
+                        "\n",
+                    )}`;
+
+                    ChatState.addContextMessage("system", window.basePrompt());
+                    ChatState.addContextMessage("user", prompt);
+
+                    const assistantRespId = ChatState.addMessage("assistant", " ");
+
+                    await openaiConnector.send(assistantRespId, (msgId, chunck) => {
+                        ChatState.updateMessage(msgId, chunck)
+                    }, [
+                        ...ChatState.messages.map(c => ({ role: c.role, content: c.content })),
+                    ]);
+                }
             }
 
             ChatRenderer.render();
@@ -202,10 +211,33 @@
                 $('#feedback-form').remove();
             });
 
-            $('#chat-messages').on('click', '#send-feedback', function () {
-                alert('Feedback enviado!');
+
+
+            $('#chat-messages').on('click', '#send-feedback', async function (e) {
+                e.preventDefault();
+
+                const resp = await githubClient.createPullRequest({
+                    owner: job.owner,
+                    repo: job.repo,
+                    headBranch: job.headBranch,
+                    baseBranch: job.baseBranch,
+                    title: job.headBranch,
+                    body: ChatState.messages[ChatState.messages.length - 1].content,
+                    githubToken: job.githubToken,
+                })
+
+                ChatState.addMessage("assistant", `✅ Pull Request criado com sucesso!
+
+        Obrigado por usar nosso serviço para automatizar seus pull requests.
+        Estamos felizes em ajudar a tornar seu fluxo de trabalho mais ágil e eficiente!
+
+        Se precisar de algo mais, estamos por aqui. 🚀
+
+🔗 Link do PR: ${resp.html_url || 'URL não disponível'}`);
+
                 $('#feedback-form').remove();
             });
+
 
         })
     </script>

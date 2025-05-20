@@ -51,9 +51,60 @@ async function getCommitsFromGitHub({
   }
 }
 
+async function createPullRequest({
+  owner,
+  repo,
+  headBranch,
+  baseBranch,
+  title,
+  body,
+  githubToken,
+}) {
+  const url = `https://api.github.com/repos/${owner}/${repo}/pulls`;
+
+  const headers = {
+    Authorization: `token ${githubToken}`,
+    Accept: "application/vnd.github.v3+json",
+    "Content-Type": "application/json",
+  };
+
+  const data = {
+    title: title,
+    head: headBranch,
+    base: baseBranch,
+    body: body,
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error(
+        `Erro ao criar o Pull Request: ${response.status} - ${response.statusText}`
+      );
+      console.error("Detalhes do erro:", errorData);
+      return null;
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Erro ao criar o Pull Request:", error);
+    return null;
+  }
+}
+
+
+
 function newGithub() {
   return {
     getCommitsFromGitHub,
+    createPullRequest,
   };
 }
 
