@@ -1,4 +1,4 @@
-export async function getCommitsFromGitHub({
+async function getCommitsFromGitHub({
   owner,
   repo,
   baseBranch,
@@ -50,3 +50,6 @@ export async function getCommitsFromGitHub({
     return [];
   }
 }
+
+
+window.github.getCommitsFromGitHub = getCommitsFromGitHub;

@@ -1,38 +1,80 @@
-function getJobsQueue() {
-  return window.useState().getState("queue");
-}
+const newJobsProcessor = () => {
+  const store = window.useState();
 
-function addJobToQueue(jobData) {
-  window.useState().appendItem("queue", jobData);
-}
+  const queue = {
+    pop() {
+      const queue = store.getState("queue");
 
-async function processNextJob() {
-  const jobs = getJobsQueue();
-  if (jobs.length === 0) {
-    console.log("Fila vazia");
-    return null;
-  }
+      if (!queue || !Array.isArray(queue)) {
+        store.setState("queue", []);
+        return null;
+      }
 
-  const currentJob = jobs[jobs.length - 1];
-  console.log("Processando:", currentJob);
+      if (queue.length == 0) {
+        console.log("Client warning: the queue is empty");
+        return null;
+      }
 
-  try {
-    const commits = await getCommitsFromGitHub({
-      owner: currentJob.owner,
-      repo: currentJob.repo,
-      baseBranch: currentJob.baseBranch,
-      headBranch: currentJob.headBranch,
-      githubToken: currentJob.githubToken,
-    });
+      const current = queue[queue.length - 1];
 
-    console.log("Processo completo. Commits:", commits);
+      store.setState("queue", queue.slice(0, -1));
 
-    const updatedJobs = jobs.slice(0, -1); //  remove the last one
-     window.useState().setState("queue", updatedJobs);
+      return current;
+    },
+    enqueue(job) {
+      const queue = store.getState("queue");
 
-    return commits;
-  } catch (error) {
-    console.error("Processo falhou:", error);
-    throw error;
-  }
-}
+      if (!queue || !Array.isArray(queue)) {
+        store.setState("queue", [job]);
+
+        return;
+      }
+
+      store.appendItem("queue", job);
+    },
+  };
+
+  return {
+    async processNextJob() {
+      const currentJob = queue.pop();
+
+      console.log("Client: Processing ", currentJob);
+
+      try {
+        const commits = await window.github.getCommitsFromGitHub({
+          owner: currentJob.owner,
+          repo: currentJob.repo,
+          baseBranch: currentJob.baseBranch,
+          headBranch: currentJob.headBranch,
+          githubToken: currentJob.githubToken,
+        });
+
+        console.log("Client: process completed. Commits:", commits);
+
+        return commits;
+      } catch (error) {
+        console.error("Client error:", error);
+        throw error;
+      }
+    },
+
+    addJob(job) {
+      if (
+        typeof job.owner !== "string" ||
+        typeof job.repo !== "string" ||
+        typeof job.baseBranch !== "string" ||
+        typeof job.headBranch !== "string" ||
+        typeof job.githubToken !== "string"
+      ) {
+        throw new Error(
+          "Client error: cannot enqueue a invalid job all fields must be defined and a string"
+        );
+      }
+
+      queue.enqueue(job);
+    },
+  };
+};
+
+
+window.jobsProcessor = newJobsProcessor();
