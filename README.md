@@ -1,20 +1,24 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=19042323&assignment_repo_type=AssignmentRepo)
-# Nome do projeto
+# Dificuldades de se escrever Pull Requests
 
-Escreva um ou dois parágrafo resumindo o objetivo do seu projeto.
+ O nosso projeto consiste na criação de uma IA, de nome "pull request generator", que visa facilitar e tornar mais prática a experiência de um desenvolvedor em escrever pull requests, que são solicitações para mesclar alterações de um branch para outro em um repositório, geralmente usadas em sistemas como GitHub. Elas permitem revisão de código, discussão e controle de versões antes da integração final.
+
+ Dessa forma nossa inovação surge como um braço direito para desenvolvedores e programadores.
+
 
 ## Alunos integrantes da equipe
 
-* Nome completo do aluno 1
-* Nome completo do aluno 2
-* Nome completo do aluno 3
-* Nome completo do aluno 4
+* Luca Pinheiro Maciel Santos
+* Heitor Lima Moreira
+* Filipe Augusto Silva Maia
+* Matheus Procópio Duarte
+* João Augusto Moreira Cunha
+* Hector Faria Braz
 
 ## Professores responsáveis
-
-* Nome completo do professor 1
-* Nome completo do professor 2
-
+* Hayala Nepomuceno Curto
+* Luciana Mara Freitas Diniz
+* Wesley Dias Maciel
 
 
 ## Instruções de utilização 
