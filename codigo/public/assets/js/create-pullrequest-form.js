@@ -138,8 +138,6 @@ function clearForm() {
 function fetchOrganizations() {
     const token = $('#githubToken').val().trim();
 
-    console.log('Token:', token); // Para verificar se o token está sendo capturado
-
     $.ajax({
         url: 'https://api.github.com/user/orgs',
         headers: { 'Authorization': 'token ' + token }
