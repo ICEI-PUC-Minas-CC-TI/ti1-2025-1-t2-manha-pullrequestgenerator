@@ -221,7 +221,7 @@
                     repo: job.repo,
                     headBranch: job.headBranch,
                     baseBranch: job.baseBranch,
-                    title: job.repo,
+                    title: job.headBranch,
                     body: ChatState.messages[ChatState.messages.length - 1].content,
                     githubToken: job.githubToken,
                 })
