@@ -1,54 +1,52 @@
 $(document).ready(function () {
     showData();
 
-    // Carrega organizações ao iniciar
+    // Load organizations when token changes
     $('#githubToken').on('change', function () {
         fetchOrganizations();
     });
 
-    // Popula repositórios ao selecionar uma organização
+    // Load repositories when organization changes
     $('#organizacao').on('change', function () {
-        fetchRepos();
+        loadRepositories($('#organizacao').val().trim());
     });
 
-    // Função de autocompletar para repositórios
+    // Autocomplete for repositories
     $("#repositorio").autocomplete({
         minLength: 0,
         source: function (request, response) {
-            // Busca em qualquer posição na string, não apenas no início
-            const results = $.grep(allRepos, function (repo) {
+            const results = $.grep(currentRepos.map(r => r.name), function (repo) {
                 return repo.toLowerCase().includes(request.term.toLowerCase());
             });
-            response(results.slice(0, 10)); // Limita a 10 resultados
+            response(results.slice(0, 8)); // Limit to 8 results
         },
         select: function (event, ui) {
             $("#repositorio").val(ui.item.value);
-            fetchBranches(); // Carregar branches após selecionar um repositório
+            fetchBranches();
             return false;
         }
     }).focus(function () {
         $(this).autocomplete("search", "");
     });
 
-    // Função de autocompletar para branches
+    // Autocomplete for branches
     $("#branch_base, #branch_comparacao").autocomplete({
         minLength: 0,
         source: function (request, response) {
             const results = $.grep(allBranches, function (branch) {
                 return branch.toLowerCase().includes(request.term.toLowerCase());
             });
-            response(results.slice(0, 10)); // Limita a 10 resultados
+            response(results.slice(0, 8));
         }
     }).focus(function () {
         $(this).autocomplete("search", "");
     });
 });
 
-// Arrays globais para armazenar os dados
-let allRepos = [];
+let currentRepos = [];
 let allBranches = [];
 
-// Exibe os dados salvos
+// Show saved data in table
 function showData() {
     const peopleList = localStorage.getItem("peopleList")
         ? JSON.parse(localStorage.getItem("peopleList"))
@@ -63,8 +61,8 @@ function showData() {
                     <td>${element.branch_base}</td>
                     <td>${element.branch_comparacao}</td>
                     <td>
-                        <button onclick="deleteData(${index})" class="btn btn-danger">Excluir</button>
-                        <button onclick="updateData(${index})" class="btn btn-warning">Editar</button>
+                        <button onclick="deleteData(${index})" class="btn btn-danger">Delete</button>
+                        <button onclick="updateData(${index})" class="btn btn-warning">Edit</button>
                     </td>
                  </tr>`;
     });
@@ -72,7 +70,7 @@ function showData() {
     $("#crudTable tbody").html(html);
 }
 
-// Adiciona novo dado
+// Add new data
 function addData() {
     if (validateForm()) {
         const organizacao = $("#organizacao").val();
@@ -92,7 +90,7 @@ function addData() {
     }
 }
 
-// Exclui dado pelo índice
+// Delete data by index
 function deleteData(index) {
     const peopleList = JSON.parse(localStorage.getItem("peopleList"));
     peopleList.splice(index, 1);
@@ -100,7 +98,7 @@ function deleteData(index) {
     showData();
 }
 
-// Atualiza um item
+// Update item by index
 function updateData(index) {
     $("#Submit").hide();
     $("#Update").show();
@@ -129,58 +127,78 @@ function updateData(index) {
     });
 }
 
-// Limpa o formulário após submit ou update
+// Clear form after submit or update
 function clearForm() {
     $("#organizacao, #repositorio, #branch_base, #branch_comparacao").val("");
 }
 
-// Funções para integrações com a API do GitHub
-function fetchOrganizations() {
+// Fetch organizations including the logged-in user
+async function fetchOrganizations() {
     const token = $('#githubToken').val().trim();
+    if (!token) return;
 
-    $.ajax({
-        url: 'https://api.github.com/user/orgs',
-        headers: { 'Authorization': 'token ' + token }
-    })
-        .done(function (data) {
-            console.log('Organizações recebidas:', data); // Log para ver o que foi retornado
-            const orgSelect = $('#organizacao');
-            orgSelect.html('<option value="">Selecione a organização</option>');
-            data.forEach(org => {
-                orgSelect.append(`<option value="${org.login}">${org.login}</option>`);
-            });
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            console.error('Erro ao carregar organizações:', textStatus, errorThrown);
+    try {
+        // Get user info
+        const user = await githubFetch('https://api.github.com/user');
+
+        // Get organizations of the user
+        const orgs = await githubFetch('https://api.github.com/user/orgs');
+
+        // Include the user as an option (personal repos)
+        const organizations = [{ login: user.login, name: user.login }, ...orgs];
+
+        const orgSelect = $('#organizacao');
+        orgSelect.html('<option value="">Select organization</option>');
+        organizations.forEach(org => {
+            orgSelect.append(`<option value="${org.login}">${org.login}</option>`);
         });
+    } catch (error) {
+        alert('Error loading organizations: ' + error.message);
+    }
 }
 
-function fetchRepos() {
+// Fetch repositories depending on organization or user
+async function loadRepositories(org) {
     const token = $('#githubToken').val().trim();
-    const org = $('#organizacao').val().trim();
+    if (!token || !org) return;
 
-    if (!org) return;
+    try {
+        currentRepos = [];
+        $('#repositorio').val('');
+        $('#repositorio').prop('disabled', true);
 
-    $.ajax({
-        url: `https://api.github.com/orgs/${org}/repos`,
-        headers: { 'Authorization': 'token ' + token }
-    })
-        .done(function (data) {
-            allRepos = data.map(repo => repo.name);
-            $("#repositorio").autocomplete("option", "source", allRepos);
-            $("#repositorio").val(''); // Limpa campo de repositório quando carregar novos
-        })
-        .fail(function () {
-            console.error('Erro ao carregar repositórios');
-        });
+        // Get logged-in user to compare
+        const userData = await githubFetch('https://api.github.com/user');
+        const username = userData.login;
+
+        let repos;
+
+        if (org === username) {
+            // Fetch personal repos
+            repos = await githubFetch(`https://api.github.com/user/repos?per_page=100`);
+        } else {
+            // Fetch organization repos
+            repos = await githubFetch(`https://api.github.com/orgs/${org}/repos?per_page=100`);
+        }
+
+        // Sort repos by updated_at descending and limit to 8
+        repos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+        currentRepos = repos.slice(0, 8);
+
+        $('#repositorio').prop('disabled', false);
+        $("#repositorio").autocomplete("option", "source", currentRepos.map(r => r.name));
+    } catch (error) {
+        alert('Error loading repositories: ' + error.message);
+    }
 }
 
+// Fetch branches for selected repo
 function fetchBranches() {
     const token = $('#githubToken').val().trim();
     const org = $('#organizacao').val().trim();
     const repo = $('#repositorio').val().trim();
 
-    if (!org || !repo) return;
+    if (!token || !org || !repo) return;
 
     $.ajax({
         url: `https://api.github.com/repos/${org}/${repo}/branches`,
@@ -189,14 +207,30 @@ function fetchBranches() {
         .done(function (data) {
             allBranches = data.map(branch => branch.name);
             $("#branch_base, #branch_comparacao").autocomplete("option", "source", allBranches);
-            $("#branch_base, #branch_comparacao").val(''); // Limpa campos de branch quando carregar novos
+            $("#branch_base, #branch_comparacao").val('');
         })
         .fail(function () {
-            console.error('Erro ao carregar branches');
+            alert('Error loading branches');
         });
 }
 
-// Valida o formulário antes de adicionar ou atualizar 
+// Helper to fetch GitHub API with authorization header
+function githubFetch(url) {
+    const token = $('#githubToken').val().trim();
+    return fetch(url, {
+        headers: {
+            'Authorization': `token ${token}`
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`GitHub API error: ${response.status}`);
+            }
+            return response.json();
+        });
+}
+
+// Validate form before submit/update
 function validateForm() {
     const organizacao = $("#organizacao").val().trim();
     const repositorio = $("#repositorio").val().trim();
@@ -204,7 +238,7 @@ function validateForm() {
     const branch_comparacao = $("#branch_comparacao").val().trim();
 
     if (!organizacao || !repositorio || !branch_base || !branch_comparacao) {
-        alert("Todos os campos devem ser preenchidos.");
+        alert("All fields must be filled.");
         return false;
     }
 
