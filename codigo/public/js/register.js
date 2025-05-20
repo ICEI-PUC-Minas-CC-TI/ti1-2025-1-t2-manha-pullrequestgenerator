@@ -21,7 +21,6 @@ $(document).ready(function () {
           return;
         }
 
-        // Verifica se já existe um usuário com o mesmo email
         fetch(`http://localhost:3000/users?email=${encodeURIComponent(email)}`)
           .then(res => res.json())
           .then(users => {
@@ -30,7 +29,6 @@ $(document).ready(function () {
               return;
             }
 
-            // Envia o novo usuário
             fetch('http://localhost:3000/users', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -47,6 +45,9 @@ $(document).ready(function () {
               .catch(() => {
                 message.addClass('text-red-500').text('Erro ao se comunicar com o servidor.');
               });
+          })
+          .catch(() => {
+            message.addClass('text-red-500').text('Erro ao verificar o email.');
           });
       });
     });

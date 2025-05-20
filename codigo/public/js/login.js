@@ -6,7 +6,6 @@ $(document).ready(function () {
     const password = $('#password').val().trim();
     const message = $('#loginMessage');
 
-    // Limpa mensagens anteriores
     message.removeClass('text-red-500 text-green-500').text('');
 
     if (!email || !password) {
@@ -15,7 +14,6 @@ $(document).ready(function () {
     }
 
     try {
-      // Busca usuário pelo email
       const response = await fetch(`http://localhost:3000/users?email=${encodeURIComponent(email)}`);
       const users = await response.json();
 
@@ -24,11 +22,10 @@ $(document).ready(function () {
         return;
       }
 
-      const user = users[0]; // único usuário esperado
+      const user = users[0];
       const storedHash = user.password;
 
-      // Compara senha fornecida com hash usando bcrypt
-      bcrypt.compare(password, storedHash, function(err, result) {
+      bcrypt.compare(password, storedHash, function (err, result) {
         if (result) {
           message.addClass('text-green-500').text('Login realizado com sucesso!');
           setTimeout(() => {
@@ -38,11 +35,9 @@ $(document).ready(function () {
           message.addClass('text-red-500').text('Senha incorreta.');
         }
       });
-
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       message.addClass('text-red-500').text('Erro ao tentar fazer login.');
     }
   });
 });
-
