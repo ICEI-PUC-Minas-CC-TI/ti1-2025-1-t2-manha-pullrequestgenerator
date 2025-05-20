@@ -13,7 +13,6 @@ export async function getCommitsFromGitHub({
   const compareUrl = `https://api.github.com/repos/${owner}/${repo}/compare/${baseBranch}...${headBranch}`;
 
   try {
-    // Comparar os branches
     const compareResponse = await fetch(compareUrl, {
       headers: githubHeaders,
     });
@@ -22,7 +21,6 @@ export async function getCommitsFromGitHub({
 
     const result = [];
 
-    // Aceitar vários de uma vez
     for (const commit of commits) {
       const commitSha = commit.sha;
       const commitMessage = commit.commit.message;
@@ -33,7 +31,6 @@ export async function getCommitsFromGitHub({
       });
       const commitData = await commitResponse.json();
 
-      // não mechi
       const commitFiles = commitData.files.map((file) => ({
         filename: file.filename,
         status: file.status,
@@ -46,7 +43,7 @@ export async function getCommitsFromGitHub({
         files: commitFiles,
       });
     }
-    // não mechi
+
     return result;
   } catch (error) {
     console.error("❌ Failed to fetch commits with changes:", error.message);

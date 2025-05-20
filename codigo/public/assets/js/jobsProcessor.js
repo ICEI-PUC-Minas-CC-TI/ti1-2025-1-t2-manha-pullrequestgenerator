@@ -1,30 +1,22 @@
-//  getCommits
 function getJobsQueue() {
-  const jobs = localStorage.getItem('queue');
-  return jobs ? JSON.parse(jobs) : [];
+  return window.useState().getState("queue");
 }
 
-// adicionar novo job à fila
-export function addJobToQueue(jobData) {
-  const jobs = getJobsQueue();
-  jobs.push(jobData);
-  saveJobsQueue(jobs);
+function addJobToQueue(jobData) {
+  window.useState().appendItem("queue", jobData);
 }
 
-// processar o próximo
-export async function processNextJob() {
+async function processNextJob() {
   const jobs = getJobsQueue();
   if (jobs.length === 0) {
     console.log("Fila vazia");
     return null;
   }
 
-  // Pega o último job da fila
   const currentJob = jobs[jobs.length - 1];
   console.log("Processando:", currentJob);
 
   try {
-    // Chama a função getCommitsFromGitHub com o job
     const commits = await getCommitsFromGitHub({
       owner: currentJob.owner,
       repo: currentJob.repo,
@@ -35,8 +27,8 @@ export async function processNextJob() {
 
     console.log("Processo completo. Commits:", commits);
 
-    const updatedJobs = jobs.slice(0, -1); // Tira o último
-    saveJobsQueue(updatedJobs);
+    const updatedJobs = jobs.slice(0, -1); //  remove the last one
+     window.useState().setState("queue", updatedJobs);
 
     return commits;
   } catch (error) {
