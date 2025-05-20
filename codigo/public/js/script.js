@@ -1,9 +1,11 @@
 $(document).ready(function () {
+  // Redireciona para a página de login
   $('#loginBtn').on('click', function () {
     window.location.href = 'login.html';
   });
 
+  // Redireciona para a página de cadastro
   $('#startBtn').on('click', function () {
-    alert('Funcionalidade de geração ainda será implementada.');
+    window.location.href = 'register.html';
   });
 });
