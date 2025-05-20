@@ -9,6 +9,11 @@
     <script src="./assets/js/openai.js"></script>
     <script src="./assets/js/useState.js"></script>
     <script src="./assets/js/generateUUID.js"></script>
+    <script src="./assets/js/jobsProcessor.js"></script>
+    <script src="./assets/js/github.js"></script>
+    <script src="./assets/js/data/basePrompt.js"></script>
+
+
 
     <script src="https://code.jquery.com/jquery-3.7.1.js"
         integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
@@ -37,82 +42,94 @@
     </footer>
 
     <script>
-        const chatStore = window.useState();
-        const chatKey = 'chat-messages';
-        const openaiConnector = window.createOpenAIConnector('API_KEY_HERE');
+        $(document).ready(async (e) => {
+            const chatStore = window.useState();
+            const githubClient = window.newGithub();
+            const chatKey = 'chat-messages';
+            const openaiConnector = window.createOpenAIConnector('API_KEY_HERE');
 
-        openaiConnector.setModel("gpt-4o-mini");
+            openaiConnector.setModel("gpt-4o-mini");
 
-        const ChatState = {
-            get messages() {
-                return chatStore.getState(chatKey) || [];
-            },
-            addMessage(role, content) {
-                const id = window.generateUUID();
-                const newMessage = { id, role, content };
-                const updatedMessages = [...this.messages, newMessage];
-                chatStore.setState(chatKey, updatedMessages);
-                ChatRenderer.render();
+            const ChatState = {
+                get messages() {
+                    return chatStore.getState(chatKey) || [];
+                },
+                addContextMessage(role, content) {
+                    const id = window.generateUUID();
+                    const newMessage = { id, role, content, shouldDisplay: false };
+                    const updatedMessages = [...this.messages, newMessage];
+                    chatStore.setState(chatKey, updatedMessages);
 
-                return id;
-            },
-            hydrate(messages) {
-                chatStore.setState(chatKey, messages);
-            },
-            clear() {
-                chatStore.setState(chatKey, []);
-            },
-            updateMessage(id, chunck) {
-                const messages = this.messages;
+                    return id;
+                },
+                addMessage(role, content) {
+                    const id = window.generateUUID();
+                    const newMessage = { id, role, content, shouldDisplay: true };
+                    const updatedMessages = [...this.messages, newMessage];
+                    chatStore.setState(chatKey, updatedMessages);
+                    ChatRenderer.render();
 
-                const message = messages.find(c => c.id == id);
+                    return id;
+                },
+                hydrate(messages) {
+                    chatStore.setState(chatKey, messages);
+                },
+                clear() {
+                    chatStore.setState(chatKey, []);
+                },
+                updateMessage(id, chunck) {
+                    const messages = this.messages;
 
-                if (!message) {
-                    throw new Error('Client error: cannot update a undefined message');
-                }
+                    const message = messages.find(c => c.id == id);
 
-                message.content = message.content + chunck;
-
-
-                this.hydrate(messages.map(c => {
-                    if (c.id == id) {
-                        return message;
+                    if (!message) {
+                        throw new Error('Client error: cannot update a undefined message');
                     }
 
-                    return c;
-                }))
+                    message.content = message.content + chunck;
 
-                ChatRenderer.render();
-            }
-        };
 
-        const ChatRenderer = {
-            render() {
-                const container = $('#chat-messages');
-                container.empty();
+                    this.hydrate(messages.map(c => {
+                        if (c.id == id) {
+                            return message;
+                        }
 
-                ChatState.messages.forEach(msg => {
-                    const messageClass = msg.role === 'user'
-                        ? 'bg-blue-100 self-end text-right'
-                        : 'bg-gray-200 self-start text-left';
+                        return c;
+                    }))
 
-                    const message = $(`
+                    ChatRenderer.render();
+                }
+            };
+
+            const ChatRenderer = {
+                render() {
+                    const container = $('#chat-messages');
+                    container.empty();
+
+                    ChatState.messages.forEach(msg => {
+                        if (msg.shouldDisplay) {
+                            const messageClass = msg.role === 'user'
+                                ? 'bg-blue-100 self-end text-right'
+                                : 'bg-gray-200 self-start text-left';
+
+                            const message = $(`
                     <div id="message-${msg.id}" class="rounded-lg px-4 py-2 ${messageClass} max-w-[80%]">
                         <p class="text-sm">${msg.content}</p>
                     </div>
                 `);
-                    container.append(message);
-                });
+                            container.append(message);
+                        }
+                    });
 
-                if (ChatState.messages.at(-1)?.role === 'assistant') {
-                    this.renderFeedbackForm(container);
-                }
+                    if (ChatState.messages.at(-1)?.role === 'assistant') {
+                        this.renderFeedbackForm(container);
+                    }
 
-                container.scrollTop(container[0].scrollHeight);
-            },
+                    container.scrollTop(container[0].scrollHeight);
+                },
 
-            renderFeedbackForm(container) {
-                const form = $(`
+                renderFeedbackForm(container) {
+                    const form = $(`
                 <div id="feedback-form" class="flex flex-col items-start space-y-2 p-4 bg-white border rounded shadow">
                     <p class="text-sm text-gray-700">Gostou da descrição gerada pelo assistente? Sinta-se livre para pedir alterações.</p>
                     <div class="flex space-x-2">
@@ -121,49 +138,76 @@
                     </div>
                 </div>
             `);
-                container.append(form);
-            }
-        };
-
-        // Inicializa a UI com mensagens persistidas
-        const existingMessages = chatStore.getState(chatKey);
-        if (Array.isArray(existingMessages)) {
-            ChatState.hydrate(existingMessages);
-        } else {
-            ChatState.hydrate([]);
-        }
-        ChatRenderer.render();
-
-        $('#chat-form').on('submit', async function (e) {
-            e.preventDefault();
-            $('#feedback-form').remove();
-            const userMsg = $('#chat-input').val().trim();
-            if (!userMsg) return;
-
-            ChatState.addMessage('user', userMsg);
-            $('#chat-input').val('');
-
-            const respId = ChatState.addMessage('assistant', '');
-
-            await openaiConnector.send(respId, (msgId, chunck) => {
-                ChatState.updateMessage(msgId, chunck)
-            }, [
-                ...ChatState.messages,
-                {
-                    role: "user",
-                    content: userMsg,
+                    container.append(form);
                 }
-            ])
-        });
+            };
 
-        $('#chat-messages').on('click', '#cancel-feedback', function () {
-            $('#feedback-form').remove();
-        });
+            // Inicializa a UI com mensagens persistidas
+            const existingMessages = chatStore.getState(chatKey);
 
-        $('#chat-messages').on('click', '#send-feedback', function () {
-            alert('Feedback enviado!');
-            $('#feedback-form').remove();
-        });
+            if (Array.isArray(existingMessages) && existingMessages.length > 0) {
+                ChatState.hydrate(existingMessages);
+            } else {
+                ChatState.hydrate([]);
+
+                const jobsProcessor = window.newJobsProcessor(chatStore, githubClient);
+
+                const commits = await jobsProcessor.processNextJob();
+
+                const commitsData = commits.map((d) => {
+                    return JSON.stringify(d)
+                });
+
+                const prompt = `Gerar uma descrição de pull request a partir das seguintes mensagens de commit:\n\n${commitsData.join(
+                    "\n",
+                )}`;
+
+                ChatState.addContextMessage("system", window.basePrompt());
+                ChatState.addContextMessage("user", prompt);
+
+                const assistantRespId = ChatState.addMessage("assistant", " ");
+
+                await openaiConnector.send(assistantRespId, (msgId, chunck) => {
+                    ChatState.updateMessage(msgId, chunck)
+                }, [
+                    ...ChatState.messages.map(c => ({ role: c.role, content: c.content })),
+                ])
+            }
+
+            ChatRenderer.render();
+
+            $('#chat-form').on('submit', async function (e) {
+                e.preventDefault();
+                $('#feedback-form').remove();
+                const userMsg = $('#chat-input').val().trim();
+                if (!userMsg) return;
+
+                ChatState.addMessage('user', userMsg);
+                $('#chat-input').val('');
+
+                const respId = ChatState.addMessage('assistant', '');
+
+                await openaiConnector.send(respId, (msgId, chunck) => {
+                    ChatState.updateMessage(msgId, chunck)
+                }, [
+                    ...ChatState.messages.map(c => ({ role: c.role, content: c.content })),
+                    {
+                        role: "user",
+                        content: userMsg,
+                    }
+                ])
+            });
+
+            $('#chat-messages').on('click', '#cancel-feedback', function () {
+                $('#feedback-form').remove();
+            });
+
+            $('#chat-messages').on('click', '#send-feedback', function () {
+                alert('Feedback enviado!');
+                $('#feedback-form').remove();
+            });
+
+        })
     </script>
 </body>
 

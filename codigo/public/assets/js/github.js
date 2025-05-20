@@ -51,5 +51,10 @@ async function getCommitsFromGitHub({
   }
 }
 
+function newGithub() {
+  return {
+    getCommitsFromGitHub,
+  };
+}
 
-window.github.getCommitsFromGitHub = getCommitsFromGitHub;
+window.newGithub = newGithub;

@@ -1,6 +1,4 @@
-const newJobsProcessor = () => {
-  const store = window.useState();
-
+function newJobsProcessor(store, ghClient) {  
   const queue = {
     pop() {
       const queue = store.getState("queue");
@@ -36,12 +34,14 @@ const newJobsProcessor = () => {
 
   return {
     async processNextJob() {
+      if (!ghClient) return null;
+      
       const currentJob = queue.pop();
 
       console.log("Client: Processing ", currentJob);
 
       try {
-        const commits = await window.github.getCommitsFromGitHub({
+        const commits = await ghClient.getCommitsFromGitHub({
           owner: currentJob.owner,
           repo: currentJob.repo,
           baseBranch: currentJob.baseBranch,
@@ -58,23 +58,11 @@ const newJobsProcessor = () => {
       }
     },
 
-    addJob(job) {
-      if (
-        typeof job.owner !== "string" ||
-        typeof job.repo !== "string" ||
-        typeof job.baseBranch !== "string" ||
-        typeof job.headBranch !== "string" ||
-        typeof job.githubToken !== "string"
-      ) {
-        throw new Error(
-          "Client error: cannot enqueue a invalid job all fields must be defined and a string"
-        );
-      }
-
+    addJob(job) {    
       queue.enqueue(job);
     },
   };
 };
 
 
-window.jobsProcessor = newJobsProcessor();
+window.newJobsProcessor = newJobsProcessor;
