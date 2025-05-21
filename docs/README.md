@@ -32,9 +32,15 @@ Uma vez autenticado com sucesso, o sistema disponibilizará ao usuário uma inte
 
 Com essas informações devidamente carregadas e organizadas, o usuário poderá então selecionar de forma prática e objetiva os branches de seu interesse, a fim de realizar comparações entre eles conforme sua necessidade de análise ou versionamento.
 
-* **Apresentação** ([Esse arquivo aqui](https://drive.google.com/drive/folders/1MkO2PqZ_h8jtpGsvCJy5qFdoOsmsxeYh?usp=drive_link)): Link da Apresentação feita em sala;
-* **Projeto de Interface Final** ([Esse arquivo aqui](https://drive.google.com/file/d/1_B62Zxc_dDKTh6179zKFMq1w4tHOckY6/view?usp=drive_link)): ;
-* **Capa do projeto** (Esse arquivo aqui): Informação básica sobre o projeto, alunos do grupo e professores responsáveis;
+* **Apresentação** https://www.canva.com/design/DAGj5he_rLU/wGpY2z988-X3TIvqqOj3Yw/edit?utm_content=DAGj5he_rLU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
+
+* **Projeto de Interface Final** https://sgapucminasbr-my.sharepoint.com/personal/1571559_sga_pucminas_br/_layouts/15/onedrive.aspx?id=%2Fpersonal%2F1571559%5Fsga%5Fpucminas%5Fbr%2FDocuments%2FC%C3%B3pia%20de%20Projeto%20de%20Interface%20Final%2Epdf&parent=%2Fpersonal%2F1571559%5Fsga%5Fpucminas%5Fbr%2FDocuments&ga=1
+
+
+* **Capa do projeto** (![alt text](<Imagem do WhatsApp de 2025-04-08 à(s) 20.03.03_07bf57a8.jpg>)): 
+
+
 * **Arquivo CITATION.cff**: descritor do projeto, utilizado para geração do certificado ao final da disciplina.
 * **Pasta código**: todos os arquivos resultantes da programação do software.
 * **Pasta docs --> arquivo README.md**: Documentação completa do projeto.
