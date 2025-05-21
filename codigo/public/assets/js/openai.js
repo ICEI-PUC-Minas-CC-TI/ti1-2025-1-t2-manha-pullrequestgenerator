@@ -36,7 +36,7 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
     },
 
     async send(msgId, callback, messages) {
-      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+      const resp = await fetch("https://api.deepseek.com/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
