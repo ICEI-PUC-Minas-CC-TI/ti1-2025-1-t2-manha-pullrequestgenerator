@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Token</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" crossorigin="anonymous"></script>
+    <script src="./assets/js/token.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#token-form').on('submit', function (e) {
+                e.preventDefault();
+
+                const token = $('#token').val();
+                if (!token) {
+
+                    return;
+                }
+
+                fetch('https://api.github.com/user/emails', {
+                    headers: {
+                        Authorization: 'token ' + token
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao obter email do GitHub.');
+                        }
+                        return response.json();
+                    })
+                    .then(emails => {
+                        const primaryEmail = emails.find(email => email.primary)?.email || emails[0]?.email;
+
+                        const expirationDate = new Date();
+                        expirationDate.setDate(expirationDate.getDate() + 7);
+
+                        const session = {
+                            token: token,
+                            email: primaryEmail,
+                            expiration: expirationDate.toISOString()
+                        };
+
+                        localStorage.setItem('session', JSON.stringify(session));
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert('Erro ao recuperar o email do GitHub.');
+                    });
+                return;
+            });
+        });
+    </script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+    <main class="flex-grow flex items-center justify-center w-full">
+        <form id="token-form" class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md space-y-6">
+            <h2 class="text-xl font-semibold text-gray-800">Conectar ao GitHub</h2>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700" for="token">
+                    GitHub Token Pessoal
+                </label>
+                <input type="password" id="token"
+                    class="w-full px-4 py-2 rounded-xl bg-gray-100 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                    placeholder="Insira seu token aqui" />
+            </div>
+
+            <button type="submit"
+                class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition duration-200">
+                Continuar
+            </button>
+            </div>
+    </main>
+</body>
+
+</html>
