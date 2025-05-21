@@ -1,17 +1,15 @@
 $(document).ready(function () {
-    showData();
-
-    // Load organizations when token changes
+    // Carrega organizações quando o token muda
     $('#githubToken').on('change', function () {
         fetchOrganizations();
     });
 
-    // Load repositories when organization changes
+    // Carrega repositórios quando a organização muda
     $('#organizacao').on('change', function () {
         loadRepositories($('#organizacao').val().trim());
     });
 
-    // Autocomplete for repositories
+    // Autocomplete para repositórios
     $("#repositorio").autocomplete({
         minLength: 0,
         source: function (request, response) {
@@ -29,7 +27,7 @@ $(document).ready(function () {
         $(this).autocomplete("search", "");
     });
 
-    // Autocomplete for branches
+    // Autocomplete para branches
     $("#branch_base, #branch_comparacao").autocomplete({
         minLength: 0,
         source: function (request, response) {
@@ -46,93 +44,7 @@ $(document).ready(function () {
 let currentRepos = [];
 let allBranches = [];
 
-// Show saved data in table
-function showData() {
-    const peopleList = localStorage.getItem("peopleList")
-        ? JSON.parse(localStorage.getItem("peopleList"))
-        : [];
-
-    let html = '';
-
-    peopleList.forEach((element, index) => {
-        html += `<tr>
-                    <td>${element.organizacao}</td>
-                    <td>${element.repositorio}</td>
-                    <td>${element.branch_base}</td>
-                    <td>${element.branch_comparacao}</td>
-                    <td>
-                        <button onclick="deleteData(${index})" class="btn btn-danger">Delete</button>
-                        <button onclick="updateData(${index})" class="btn btn-warning">Edit</button>
-                    </td>
-                 </tr>`;
-    });
-
-    $("#crudTable tbody").html(html);
-}
-
-// Add new data
-function addData() {
-    if (validateForm()) {
-        const organizacao = $("#organizacao").val();
-        const repositorio = $("#repositorio").val();
-        const branch_base = $("#branch_base").val();
-        const branch_comparacao = $("#branch_comparacao").val();
-
-        const peopleList = localStorage.getItem("peopleList")
-            ? JSON.parse(localStorage.getItem("peopleList"))
-            : [];
-
-        peopleList.push({ organizacao, repositorio, branch_base, branch_comparacao });
-
-        localStorage.setItem("peopleList", JSON.stringify(peopleList));
-        clearForm();
-        showData();
-    }
-}
-
-// Delete data by index
-function deleteData(index) {
-    const peopleList = JSON.parse(localStorage.getItem("peopleList"));
-    peopleList.splice(index, 1);
-    localStorage.setItem("peopleList", JSON.stringify(peopleList));
-    showData();
-}
-
-// Update item by index
-function updateData(index) {
-    $("#Submit").hide();
-    $("#Update").show();
-
-    const peopleList = JSON.parse(localStorage.getItem("peopleList"));
-
-    $("#organizacao").val(peopleList[index].organizacao);
-    $("#repositorio").val(peopleList[index].repositorio);
-    $("#branch_base").val(peopleList[index].branch_base);
-    $("#branch_comparacao").val(peopleList[index].branch_comparacao);
-
-    $("#Update").off('click').on('click', function () {
-        if (validateForm()) {
-            peopleList[index].organizacao = $("#organizacao").val();
-            peopleList[index].repositorio = $("#repositorio").val();
-            peopleList[index].branch_base = $("#branch_base").val();
-            peopleList[index].branch_comparacao = $("#branch_comparacao").val();
-
-            localStorage.setItem("peopleList", JSON.stringify(peopleList));
-            clearForm();
-            showData();
-
-            $("#Submit").show();
-            $("#Update").hide();
-        }
-    });
-}
-
-// Clear form after submit or update
-function clearForm() {
-    $("#organizacao, #repositorio, #branch_base, #branch_comparacao").val("");
-}
-
-// Fetch organizations including the logged-in user
+// Busca as organizações do usuário e popula o select
 async function fetchOrganizations() {
     const token = $('#githubToken').val().trim();
     if (!token) return;
@@ -152,7 +64,7 @@ async function fetchOrganizations() {
     }
 }
 
-// Fetch repositories depending on organization or user
+// Carrega os repositórios da organização selecionada
 async function loadRepositories(org) {
     const token = $('#githubToken').val().trim();
     if (!token || !org) return;
@@ -168,13 +80,15 @@ async function loadRepositories(org) {
         let repos;
 
         if (org === username) {
+            // Repositórios do usuário
             repos = await githubFetch(`https://api.github.com/users/${username}/repos?per_page=100`);
         } else {
+            // Repositórios da organização
             repos = await githubFetch(`https://api.github.com/orgs/${org}/repos?per_page=100`);
         }
 
         repos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-        currentRepos = repos; // Removido slice(0, 8)
+        currentRepos = repos;
 
         $('#repositorio').prop('disabled', false);
         $("#repositorio").autocomplete("option", "source", currentRepos.map(r => r.name));
@@ -183,7 +97,7 @@ async function loadRepositories(org) {
     }
 }
 
-// Fetch branches for selected repo (with pagination)
+// Busca branches do repositório selecionado
 async function fetchBranches() {
     const token = $('#githubToken').val().trim();
     const org = $('#organizacao').val().trim();
@@ -210,7 +124,7 @@ async function fetchBranches() {
     }
 }
 
-// Helper to fetch GitHub API with authorization header
+// Função para chamadas autenticadas à API do GitHub
 function githubFetch(url) {
     const token = $('#githubToken').val().trim();
     return fetch(url, {
@@ -226,7 +140,7 @@ function githubFetch(url) {
         });
 }
 
-// Validate form before submit/update
+// Valida se todos os campos obrigatórios foram preenchidos
 function validateForm() {
     const organizacao = $("#organizacao").val().trim();
     const repositorio = $("#repositorio").val().trim();
@@ -240,4 +154,3 @@ function validateForm() {
 
     return true;
 }
-
