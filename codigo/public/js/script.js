@@ -6,6 +6,6 @@ $(document).ready(function () {
 
   // Redireciona para a página de cadastro
   $('#startBtn').on('click', function () {
-    window.location.href = '/token';
+    window.location.href = 'token.html';
   });
 });
