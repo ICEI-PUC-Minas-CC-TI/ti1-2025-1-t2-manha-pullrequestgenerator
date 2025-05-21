@@ -18,7 +18,7 @@ $(document).ready(function () {
             const results = $.grep(currentRepos.map(r => r.name), function (repo) {
                 return repo.toLowerCase().includes(request.term.toLowerCase());
             });
-            response(results.slice(0, 8)); // Limit to 8 results
+            response(results);
         },
         select: function (event, ui) {
             $("#repositorio").val(ui.item.value);
@@ -36,7 +36,7 @@ $(document).ready(function () {
             const results = $.grep(allBranches, function (branch) {
                 return branch.toLowerCase().includes(request.term.toLowerCase());
             });
-            response(results.slice(0, 8));
+            response(results);
         }
     }).focus(function () {
         $(this).autocomplete("search", "");
@@ -138,13 +138,8 @@ async function fetchOrganizations() {
     if (!token) return;
 
     try {
-        // Get user info
         const user = await githubFetch('https://api.github.com/user');
-
-        // Get organizations of the user
         const orgs = await githubFetch('https://api.github.com/user/orgs');
-
-        // Include the user as an option (personal repos)
         const organizations = [{ login: user.login, name: user.login }, ...orgs];
 
         const orgSelect = $('#organizacao');
@@ -167,23 +162,19 @@ async function loadRepositories(org) {
         $('#repositorio').val('');
         $('#repositorio').prop('disabled', true);
 
-        // Get logged-in user to compare
         const userData = await githubFetch('https://api.github.com/user');
         const username = userData.login;
 
         let repos;
 
         if (org === username) {
-            // Fetch personal repos
             repos = await githubFetch(`https://api.github.com/users/${username}/repos?per_page=100`);
         } else {
-            // Fetch organization repos
             repos = await githubFetch(`https://api.github.com/orgs/${org}/repos?per_page=100`);
         }
 
-        // Sort repos by updated_at descending and limit to 8
         repos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-        currentRepos = repos.slice(0, 8);
+        currentRepos = repos; // Removido slice(0, 8)
 
         $('#repositorio').prop('disabled', false);
         $("#repositorio").autocomplete("option", "source", currentRepos.map(r => r.name));
@@ -192,26 +183,31 @@ async function loadRepositories(org) {
     }
 }
 
-// Fetch branches for selected repo
-function fetchBranches() {
+// Fetch branches for selected repo (with pagination)
+async function fetchBranches() {
     const token = $('#githubToken').val().trim();
     const org = $('#organizacao').val().trim();
     const repo = $('#repositorio').val().trim();
 
     if (!token || !org || !repo) return;
 
-    $.ajax({
-        url: `https://api.github.com/repos/${org}/${repo}/branches`,
-        headers: { 'Authorization': 'token ' + token }
-    })
-        .done(function (data) {
-            allBranches = data.map(branch => branch.name);
-            $("#branch_base, #branch_comparacao").autocomplete("option", "source", allBranches);
-            $("#branch_base, #branch_comparacao").val('');
-        })
-        .fail(function () {
-            alert('Error loading branches');
-        });
+    try {
+        let branches = [];
+        let page = 1;
+        let fetched;
+
+        do {
+            fetched = await githubFetch(`https://api.github.com/repos/${org}/${repo}/branches?per_page=100&page=${page}`);
+            branches = branches.concat(fetched);
+            page++;
+        } while (fetched.length === 100);
+
+        allBranches = branches.map(branch => branch.name);
+        $("#branch_base, #branch_comparacao").autocomplete("option", "source", allBranches);
+        $("#branch_base, #branch_comparacao").val('');
+    } catch (error) {
+        alert('Error loading branches: ' + error.message);
+    }
 }
 
 // Helper to fetch GitHub API with authorization header
@@ -244,3 +240,4 @@ function validateForm() {
 
     return true;
 }
+
