@@ -5,5 +5,25 @@
       "email": "teste@email.com",
       "password": "$2a$10$z5Vnltv7ZqYINzK/b6s7E.n1VLU.Yp34/WNMSbTWK/hh2bnym0wLG"
     }
+  ],
+  "chats": [
+    {
+      "id": 1,
+      "userId": 1,
+      "messages": [
+        {
+          "id": 1,
+          "content": "message here",
+          "role": "assistant",
+          "date": "2025-05-22T23:17:09.524Z"
+        },
+         {
+          "id": 2,
+          "content": "message here",
+          "role": "user",
+          "date": "2025-05-22T23:17:09.524Z"
+        }
+      ]
+    }
   ]
 }
