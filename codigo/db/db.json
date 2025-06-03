@@ -1,19 +1,20 @@
 {
-  "pullRequests": [],
   "users": [
     {
-      "id": 1,
       "name": "Heitor Lima Moreira",
       "email": "heitorlmoreira@gmail.com",
-      "session": "15901u590uurjakrj904239",
-      "session_expires_at": "2025-05-16T12:32:44.252Z"
+      "password": "5f30a2d8806048a348cb5d529edd8947e0adc03262f1c3c77f90661d3672bce9",
+      "token": "TOKEN_HERE",
+      "id": 1
     }
   ],
   "chats": [
     {
       "id": 1,
-      "owner": 1,
-      "messages": [{}]
+      "userId": 1,
+      "messages": [
+        {}
+      ]
     }
   ]
 }
