@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="./assets/js/openai.js"></script>
     <script src="./assets/js/useState.js"></script>
+    <script src="./assets/js/useChat.js"></script>
+    <script src="./assets/js/useChatUI.js"></script>
     <script src="./assets/js/generateUUID.js"></script>
     <script src="./assets/js/jobsProcessor.js"></script>
     <script src="./assets/js/github.js"></script>
@@ -43,122 +45,23 @@
 
     <script>
         $(document).ready(async (e) => {
+            const chat = window.useChat();
             const chatStore = window.useState();
+
             const githubClient = window.newGithub();
-            const chatKey = 'chat-messages';
             const openaiConnector = window.createOpenAIConnector("API_KEY_HERE");
 
+            openaiConnector.setModel("chatgpt-4o-latest");
             let job = {};
 
-            openaiConnector.setModel("deepseek-chat");
-
-            const ChatState = {
-                get messages() {
-                    return chatStore.getState(chatKey) || [];
-                },
-                addContextMessage(role, content) {
-                    const id = window.generateUUID();
-                    const newMessage = { id, role, content, shouldDisplay: false };
-                    const updatedMessages = [...this.messages, newMessage];
-                    chatStore.setState(chatKey, updatedMessages);
-
-                    return id;
-                },
-                addMessage(role, content) {
-                    const id = window.generateUUID();
-                    const newMessage = { id, role, content, shouldDisplay: true };
-                    const updatedMessages = [...this.messages, newMessage];
-                    chatStore.setState(chatKey, updatedMessages);
-                    ChatRenderer.render();
-
-                    return id;
-                },
-                hydrate(messages) {
-                    chatStore.setState(chatKey, messages);
-                },
-                clear() {
-                    chatStore.setState(chatKey, []);
-                },
-                updateMessage(id, chunck) {
-                    const messages = this.messages;
-
-                    const message = messages.find(c => c.id == id);
-
-                    if (!message) {
-                        throw new Error('Client error: cannot update a undefined message');
-                    }
-
-                    message.content = message.content + chunck;
-
-                    fetch(`http://localhost:3000/messages/${message.id}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ content: message.content })
-                    });
-
-
-                    this.hydrate(messages.map(c => {
-                        if (c.id == id) {
-                            return message;
-                        }
-
-                        return c;
-                    }))
-
-                    ChatRenderer.render();
-                }
-            };
-
-            const ChatRenderer = {
-                render() {
-                    const container = $('#chat-messages');
-                    container.empty();
-
-                    ChatState.messages.forEach(msg => {
-                        if (msg.shouldDisplay) {
-                            const messageClass = msg.role === 'user'
-                                ? 'bg-blue-100 self-end text-right'
-                                : 'bg-gray-200 self-start text-left';
-
-                            const message = $(`
-                    <div id="message-${msg.id}" class="rounded-lg px-4 py-2 ${messageClass} max-w-[80%]">
-                        <p class="text-sm">${msg.content}</p>
-                    </div>
-                `);
-                            container.append(message);
-                        }
-                    });
-
-                    if (ChatState.messages.at(-1)?.role === 'assistant') {
-                        this.renderFeedbackForm(container);
-                    }
-
-                    container.scrollTop(container[0].scrollHeight);
-                },
-
-                renderFeedbackForm(container) {
-                    const form = $(`
-                <div id="feedback-form" class="flex flex-col items-start space-y-2 p-4 bg-white border rounded shadow">
-                    <p class="text-sm text-gray-700">Gostou da descrição gerada pelo assistente? Sinta-se livre para pedir alterações.</p>
-                    <div class="flex space-x-2">
-                        <button id="send-feedback" class="bg-blue-600 text-white px-3 py-1 rounded text-sm">Enviar</button>
-                        <button id="cancel-feedback" class="bg-gray-300 text-black px-3 py-1 rounded text-sm">Cancelar</button>
-                    </div>
-                </div>
-            `);
-                    container.append(form);
-                }
-            };
 
             // Inicializa a UI com mensagens persistidas
-            const existingMessages = chatStore.getState(chatKey);
+            const existingMessages = chat.getMessages();
 
             if (Array.isArray(existingMessages) && existingMessages.length > 0) {
-                ChatState.hydrate(existingMessages);
+                chat.hydrate(existingMessages);
             } else {
-                ChatState.hydrate([]);
+                chat.hydrate([]);
 
                 const jobsProcessor = window.newJobsProcessor(chatStore, githubClient);
 
@@ -167,43 +70,22 @@
                 if (queue.length > 0) {
                     job = queue[queue.length - 1];
 
-
                     const commits = await jobsProcessor.processNextJob();
 
                     const commitsData = commits.map((d) => {
                         return JSON.stringify(d)
                     });
-
-                    const prompt = `Gerar uma descrição de pull request a partir das seguintes mensagens de commit:\n\n${commitsData.join(
-                        "\n",
-                    )}`;
-
-                    ChatState.addContextMessage("system", window.basePrompt());
-                    ChatState.addContextMessage("user", prompt);
-
-                    const assistantRespId = ChatState.addMessage("assistant", " ");
-
-                    await fetch('http://localhost:3000/messages', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            role: 'assistant',
-                            content: '',
-                            timestamp: new Date().toISOString()
-                        })
-                    });
-
+    
+                    const assistantRespId = chat.prepareChat(commitsData);
+                    
                     await openaiConnector.send(assistantRespId, (msgId, chunck) => {
-                        ChatState.updateMessage(msgId, chunck)
+                        chat.updateMessage(msgId, chunck)
                     }, [
-                        ...ChatState.messages.map(c => ({ role: c.role, content: c.content })),
+                        ...chat.getMessages().map(c => ({ role: c.role, content: c.content })),
                     ]);
                 }
             }
 
-            ChatRenderer.render();
 
             $('#chat-form').on('submit', async function (e) {
                 e.preventDefault();
@@ -211,39 +93,16 @@
                 const userMsg = $('#chat-input').val().trim();
                 if (!userMsg) return;
 
-                ChatState.addMessage('user', userMsg);
-                await fetch('http://localhost:3000/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        role: 'user',
-                        content: userMsg,
-                        timestamp: new Date().toISOString()
-                    })
-                });
+                chat.addMessage('user', userMsg);
 
                 $('#chat-input').val('');
 
-                const respId = ChatState.addMessage('assistant', '');
-
-                await fetch('http://localhost:3000/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        role: 'assistant',
-                        content: '',
-                        timestamp: new Date().toISOString()
-                    })
-                });
-
+                const respId = chat.addMessage('assistant', '');
+     
                 await openaiConnector.send(respId, (msgId, chunck) => {
-                    ChatState.updateMessage(msgId, chunck)
+                    chat.updateMessage(msgId, chunck)
                 }, [
-                    ...ChatState.messages.map(c => ({ role: c.role, content: c.content })),
+                    ...chat.getMessages().map(c => ({ role: c.role, content: c.content })),
                     {
                         role: "user",
                         content: userMsg,
@@ -260,17 +119,19 @@
             $('#chat-messages').on('click', '#send-feedback', async function (e) {
                 e.preventDefault();
 
+                const msgs = chat.getMessages();
+
                 const resp = await githubClient.createPullRequest({
                     owner: job.owner,
                     repo: job.repo,
                     headBranch: job.headBranch,
                     baseBranch: job.baseBranch,
                     title: job.headBranch,
-                    body: ChatState.messages[ChatState.messages.length - 1].content,
+                    body: msgs[msgs.length - 1].content,
                     githubToken: job.githubToken,
                 })
 
-                ChatState.addMessage("assistant", `✅ Pull Request criado com sucesso!
+                chat.addMessage("assistant", `✅ Pull Request criado com sucesso!
 
         Obrigado por usar nosso serviço para automatizar seus pull requests.
         Estamos felizes em ajudar a tornar seu fluxo de trabalho mais ágil e eficiente!
