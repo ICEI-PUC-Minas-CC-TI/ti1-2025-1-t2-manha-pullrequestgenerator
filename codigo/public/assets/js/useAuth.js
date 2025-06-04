@@ -128,11 +128,16 @@ function useAuth() {
     };
   };
 
+  const getSession = () => {
+    return store.getState('session');
+  }
+
   return {
     login,
     setToken,
     register,
-    getUserMetadata
+    getUserMetadata,
+    getSession
   };
 }
 
