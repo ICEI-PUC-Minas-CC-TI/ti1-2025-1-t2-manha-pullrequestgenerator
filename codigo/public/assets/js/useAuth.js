@@ -110,7 +110,7 @@ function useAuth() {
 
     const resp = await fetch("https://api.github.com/user", {
       headers: {
-        Authorization: `token ${token}`,
+        Authorization: `token ${session.token}`,
       },
     });
 
