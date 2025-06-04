@@ -129,7 +129,21 @@ function useAuth() {
   };
 
   const getSession = () => {
-    return store.getState('session');
+    const session = store.getState('session');
+
+    if (!session) return null;
+
+    const now = new Date();
+    const expiration = new Date(session.expiration);
+
+    if (now > expiration) {
+      store.setState('session', null);
+      window.location.href = "login.html";
+
+      return null;
+    }
+
+    return session;
   }
 
   return {
