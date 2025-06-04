@@ -129,7 +129,7 @@ function useAuth() {
   };
 
   const getSession = () => {
-    const session = store.getState('session');
+    const session = store.getState("session");
 
     if (!session) return null;
 
@@ -137,21 +137,27 @@ function useAuth() {
     const expiration = new Date(session.expiration);
 
     if (now > expiration) {
-      store.setState('session', null);
+      store.setState("session", null);
       window.location.href = "login.html";
 
       return null;
     }
 
     return session;
-  }
+  };
+
+  const logOut = () => {
+    store.SetState("session", null);
+    window.location.href = "index.html";
+  };
 
   return {
     login,
     setToken,
     register,
     getUserMetadata,
-    getSession
+    getSession,
+    logOut
   };
 }
 
