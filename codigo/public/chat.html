@@ -14,6 +14,8 @@
     <script src="./assets/js/jobsProcessor.js"></script>
     <script src="./assets/js/github.js"></script>
     <script src="./assets/js/data/basePrompt.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/codigo/public/assets/js/router.js"></script>
 
 
 
@@ -75,9 +77,9 @@
                     const commitsData = commits.map((d) => {
                         return JSON.stringify(d)
                     });
-    
+
                     const assistantRespId = chat.prepareChat(commitsData);
-                    
+
                     await openaiConnector.send(assistantRespId, (msgId, chunck) => {
                         chat.updateMessage(msgId, chunck)
                     }, [
@@ -98,7 +100,7 @@
                 $('#chat-input').val('');
 
                 const respId = chat.addMessage('assistant', '');
-     
+
                 await openaiConnector.send(respId, (msgId, chunck) => {
                     chat.updateMessage(msgId, chunck)
                 }, [
