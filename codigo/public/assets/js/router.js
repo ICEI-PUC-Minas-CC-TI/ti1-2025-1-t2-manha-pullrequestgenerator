@@ -20,10 +20,16 @@ window.useRouter = function () {
         return window.location.href;
     }
 
+
+    function onPopState(callback) {
+        window.addEventListener("popstate", callback);
+    }
+
     return {
         push,
         query: getQueryParam,
         getPath,
         getUrl,
+        onPopState,
     };
 };
