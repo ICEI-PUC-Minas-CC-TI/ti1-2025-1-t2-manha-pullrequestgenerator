@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.js" crossorigin="anonymous"></script>
   <script src="./assets/js/useState.js"></script>
+  <script src="./assets/js/useRouter.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
@@ -37,7 +38,8 @@
       $('#token-form').on('submit', async (e) => {
         e.preventDefault();
 
-        const store = useState();
+        const store = window.useState();
+        const router = window.useRouter();
 
         const token = $('#token').val().trim();
         const errorMessage = $('#error-message');
@@ -74,7 +76,7 @@
 
         store.setState('session', session);
 
-        window.location.href = 'register.html';
+        router.push('register.html');
 
       })
     });
