@@ -11,6 +11,7 @@ const hashPassword = async (password) => {
 
 function useAuth() {
   const store = window.useState();
+  const router = window.useRouter();
 
   const setToken = async (token, user) => {
     const resp = await fetch("https://api.github.com/user", {
@@ -68,7 +69,7 @@ function useAuth() {
   const register = async (email, name, password) => {
     const tempSession = store.getState("session");
     if (!tempSession) {
-      window.location.href = "token.html";
+      router.push("token.html");
       return;
     }
 
@@ -138,7 +139,7 @@ function useAuth() {
 
     if (now > expiration) {
       store.setState("session", null);
-      window.location.href = "login.html";
+      router.push("login.html");
 
       return null;
     }
@@ -148,7 +149,7 @@ function useAuth() {
 
   const logOut = () => {
     store.SetState("session", null);
-    window.location.href = "index.html";
+    router.push("index.html");
   };
 
   return {
@@ -157,7 +158,7 @@ function useAuth() {
     register,
     getUserMetadata,
     getSession,
-    logOut
+    logOut,
   };
 }
 
