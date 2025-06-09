@@ -18,9 +18,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 flex flex-col items-center min-h-screen py-10">
 
-    <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+<body class="bg-white min-h-screen flex flex-col">
+
+    <nav class="w-full shadow-sm px-6 py-4 bg-white flex justify-between items-center">
+        <h1 class="text-xl font-semibold text-blue-600">Pull Request Generator</h1>
+        <a href="/login" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Login</a>
+    </nav>
+
+
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
         <h1 class="text-2xl font-bold text-center mb-6">Gerar Descrição de Pull Request</h1>
 
         <!-- Campo para o token do GitHub -->
