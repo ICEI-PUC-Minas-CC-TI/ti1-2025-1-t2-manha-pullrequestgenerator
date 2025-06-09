@@ -9,6 +9,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="assets/js/homepage.js"></script>
+  <script src="assets/js/useAuth.js"></script>
+  <script src="assets/js/userCard.js"></script>
+  <script src="./assets/js/useState.js"></script>
+  <script src="./assets/js/useRouter.js"""></script>
 </head>
 
 <body class="bg-white text-gray-900">
@@ -16,10 +20,12 @@
   <!-- Navbar -->
   <header class="flex items-center justify-between px-6 py-4 shadow-md">
     <h1 class="text-lg font-semibold text-blue-600">Pull Request Generator</h1>
-    <button id="loginBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-      Login
-    </button>
+    <div class="flex items-center gap-4">
+      <div id="userContainer" class="relative"></div>
+    </div>
+
   </header>
+
 
   <!-- Hero Section -->
   <main class="flex flex-col items-center justify-center min-h-[80vh] px-6 text-center">
@@ -38,9 +44,6 @@
   <footer class="text-center text-gray-500 text-sm py-4">
     © 2025 Pull Request Generator. Todos os direitos reservados.
   </footer>
-</body>
-
-</html>
 </body>
 
 </html>

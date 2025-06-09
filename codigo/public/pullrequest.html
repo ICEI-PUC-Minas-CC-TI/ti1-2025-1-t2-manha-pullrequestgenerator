@@ -12,6 +12,9 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="./assets/js/jobsProcessor.js"></script>
     <script src="./assets/js/useState.js"></script>
+    <script src="./assets/js/useRouter.js"></script>
+    <script src="./assets/js/useAuth.js"></script>
+    <script src="./assets/js/userCard.js"></script>
 
 
     <!-- Tailwind CSS -->
@@ -21,10 +24,12 @@
 
 <body class="bg-white min-h-screen flex flex-col">
 
-    <nav class="w-full shadow-sm px-6 py-4 bg-white flex justify-between items-center">
-        <h1 class="text-xl font-semibold text-blue-600">Pull Request Generator</h1>
-        <a href="/login" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Login</a>
-    </nav>
+    <header class="flex items-center justify-between px-6 py-4 shadow-md">
+    <h1 class="text-lg font-semibold text-blue-600">Pull Request Generator</h1>
+    <div class="flex items-center gap-4">
+      <div id="userContainer" class="relative"></div>
+    </div>
+    </header>
 
 
     <div class="flex items-center justify-center min-h-screen bg-gray-100">
