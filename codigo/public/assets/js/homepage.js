@@ -1,11 +1,11 @@
-$(document).ready(function () {
-  // Redireciona para a página de login
-  $('#loginBtn').on('click', function () {
-    window.location.href = 'login.html';
-  });
+document.addEventListener('DOMContentLoaded', () => {
+    const { isAuthenticated } = useAuth();
+    
+    const router = window.useRouter(); 
 
-  // Redireciona para a página de cadastro
-  $('#startBtn').on('click', function () {
-    window.location.href = 'token.html';
-  });
+    if (isAuthenticated()) {
+        router.push('chat.html');
+    } else {
+        router.push('login.html');
+    }
 });

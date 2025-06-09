@@ -1,28 +1,19 @@
-function useRouter() {
-  const getQueryParam = (key) => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(key);
-  };
+// codigo/public/assets/js/useRouter.js
 
-  const onPopState = (callback) => {
-    window.addEventListener("popstate", callback);
-  };
+const useRouter = () => {
+    const push = (path) => { // Renomeado de navigateTo para push
+        window.location.href = path;
+    };
 
-  const push = (path) => {
-    window.location.href = path;
-  };
+    const getCurrentPath = () => {
+        return window.location.pathname;
+    };
 
-  const getPath = () => window.location.pathname;
+    return {
+        push, // Retorna a função push
+        getCurrentPath
+    };
+};
 
-  const getUrl = () => window.location.href;
-
-  return {
-    push,
-    query: getQueryParam,
-    getPath,
-    getUrl,
-    onPopState,
-  };
-}
-
+// Expõe useRouter globalmente para ser acessível via window.useRouter()
 window.useRouter = useRouter;
