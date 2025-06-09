@@ -1,6 +1,5 @@
-
 $(document).ready(async (e) => {
-    // Inicialização de dependências
+    // Inicializa serviços
     const chat = window.useChat();
     const chatStore = window.useState();
     const githubClient = window.newGithub();
@@ -9,81 +8,51 @@ $(document).ready(async (e) => {
     openaiConnector.setModel("chatgpt-4o-latest");
     let job = {};
 
-    // Inicialização do chat
-    const existingMessages = chat.getMessages();
-    
-    if (Array.isArray(existingMessages) && existingMessages.length > 0) {
-        chat.hydrate(existingMessages);
-    } 
+    // Restaura ou inicia novo chat
+    const messages = chat.getMessages();
+    if (messages?.length) chat.hydrate(messages);
     else {
         chat.hydrate([]);
-        const jobsProcessor = window.newJobsProcessor(chatStore, githubClient);
         const queue = chatStore.getState("queue");
-
-        if (queue.length > 0) {
+        if (queue?.length) {
             job = queue[queue.length - 1];
-            const commits = await jobsProcessor.processNextJob();
-            const commitsData = commits.map((d) => JSON.stringify(d));
-            const assistantRespId = chat.prepareChat(commitsData);
-
-            await openaiConnector.send(
-                assistantRespId,
-                (msgId, chunck) => chat.updateMessage(msgId, chunck),
-                [...chat.getMessages().map(c => ({ role: c.role, content: c.content }))]
-            );
+            const commits = await window.newJobsProcessor(chatStore, githubClient).processNextJob();
+            const respId = chat.prepareChat(commits.map(d => JSON.stringify(d)));
+            await openaiConnector.send(respId, (id, chunk) => chat.updateMessage(id, chunk), 
+                [...chat.getMessages().map(c => ({ role: c.role, content: c.content }))]);
         }
     }
 
-    // Event Handlers
-    $('#chat-form').on('submit', async function (e) {
+    // Envio de mensagens
+    $('#chat-form').on('submit', async function(e) {
         e.preventDefault();
-        $('#feedback-form').remove();
+        const msg = $('#chat-input').val().trim();
+        if (!msg) return;
         
-        const userMsg = $('#chat-input').val().trim();
-        if (!userMsg) return;
-
-        chat.addMessage('user', userMsg);
+        chat.addMessage('user', msg);
         $('#chat-input').val('');
         
         const respId = chat.addMessage('assistant', '');
-
-        await openaiConnector.send(
-            respId,
-            (msgId, chunck) => chat.updateMessage(msgId, chunck),
-            [
-                ...chat.getMessages().map(c => ({ role: c.role, content: c.content })),
-                { role: "user", content: userMsg }
-            ]
-        );
+        await openaiConnector.send(respId, (id, chunk) => chat.updateMessage(id, chunk), [
+            ...chat.getMessages().map(c => ({ role: c.role, content: c.content })),
+            { role: "user", content: msg }
+        ]);
     });
 
-    $('#chat-messages').on('click', '#cancel-feedback', function () {
-        $('#feedback-form').remove();
-    });
-
-    $('#chat-messages').on('click', '#send-feedback', async function (e) {
+    // Criação de PR no GitHub
+    $('#chat-messages').on('click', '#send-feedback', async function(e) {
         e.preventDefault();
-        const msgs = chat.getMessages();
-
-        const resp = await githubClient.createPullRequest({
+        const lastMsg = chat.getMessages().slice(-1)[0].content;
+        const pr = await githubClient.createPullRequest({
             owner: job.owner,
             repo: job.repo,
             headBranch: job.headBranch,
             baseBranch: job.baseBranch,
             title: job.headBranch,
-            body: msgs[msgs.length - 1].content,
+            body: lastMsg,
             githubToken: job.githubToken,
         });
 
-        chat.addMessage("assistant", `✅ Pull Request criado com sucesso!
-
-        Obrigado por usar nosso serviço para automatizar seus pull requests.
-        Estamos felizes em ajudar a tornar seu fluxo de trabalho mais ágil e eficiente!
-
-        Se precisar de algo mais, estamos por aqui. 🚀
-
-🔗 Link do PR: ${resp.html_url || 'URL não disponível'}`);
-
-        $('#feedback-form').remove();
+        chat.addMessage("assistant", `✅ PR criado: ${pr.html_url}`);
     });
 });
