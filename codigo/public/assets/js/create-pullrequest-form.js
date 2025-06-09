@@ -1,5 +1,7 @@
+// Cache para armazenar repositórios e branches
 let currentRepos = [], allBranches = [];
 
+// Busca organizações do usuário
 async function fetchOrganizations() {
     const token = $("#githubToken").val().trim();
     if (!token) return;
@@ -18,6 +20,7 @@ async function fetchOrganizations() {
     }
 }
 
+// Carrega repositórios selecionados
 async function loadRepositories(org) {
     const token = $("#githubToken").val().trim();
     if (!token || !org) return;
@@ -41,6 +44,7 @@ async function loadRepositories(org) {
     }
 }
 
+// Busca todas as branches do repositório
 async function fetchBranches() {
     const token = $("#githubToken").val().trim();
     const org = $("#organizacao").val().trim();
@@ -65,12 +69,14 @@ async function fetchBranches() {
     }
 }
 
+// Faz requisições autenticadas para a API do GitHub
 function githubFetch(url) {
     return fetch(url, {
         headers: { Authorization: `token ${$("#githubToken").val().trim()}` }
     }).then(res => res.ok ? res.json() : Promise.reject(`GitHub API error: ${res.status}`));
 }
 
+// Valida se o formulário está preenchido
 function validateForm() {
     const fields = ["organizacao", "repositorio", "branch_base", "branch_comparacao"];
     if (fields.some(field => !$(`#${field}`).val().trim())) {
@@ -80,9 +86,12 @@ function validateForm() {
     return true;
 }
 
+// Configuração inicial da página
 $(function() {
+    // Eventos para carregar dados conforme seleção do usuário
     $("#githubToken").on("change", fetchOrganizations);
     $("#organizacao").on("change", () => loadRepositories($("#organizacao").val().trim()));
+    // Submissão do formulário
     $("#Submit").on("click", e => {
         e.preventDefault();
         if (validateForm()) {
@@ -98,6 +107,7 @@ $(function() {
         }
     });
 
+    // Autocomplete para repositórios
     $("#repositorio").autocomplete({
         minLength: 0,
         source: (req, res) => res($.grep(
