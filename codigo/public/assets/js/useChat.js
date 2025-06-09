@@ -1,9 +1,15 @@
 function useChat() {
   const store = window.useState();
+  const authStore = window.useAuth();
+  const router = window.useRouter();
 
   const NewMessage = (role, content, shouldDisplay) => {
     const id = window.generateUUID();
     return { id, role, content, shouldDisplay };
+  };
+
+  const getChatId = () => {
+    return store.GetState("chat-id");
   };
 
   const getMessages = () => {
@@ -15,6 +21,30 @@ function useChat() {
   const setMessages = (messages) => {
     store.setState("chat-messages", messages);
     chatUI.render();
+  };
+
+  const saveMessages = async () => {
+    const chatId = getChatId();
+
+    const currentMessages = getMessages();
+
+    const resp = await fetch("http://localhost:3000/chats/" + chatId);
+
+    if (!resp.ok) throw new Error("Client Error: cannot save the new messages");
+
+    const chat = await resp.json();
+
+    const updateResp = await fetch("http://localhost:3000/chats/" + chatId, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...chat,
+        messages: currentMessages,
+      }),
+    });
+
+    if (!updateResp.ok)
+      throw new Error("Client Error: cannot save the new messages");
   };
 
   const addContextMessage = (role, content) => {
@@ -62,7 +92,7 @@ function useChat() {
     );
   };
 
-  const prepareChat = (commitsData) => {
+  const prepareChat = async (commitsData) => {
     clear();
 
     const prompt = `Gerar uma descrição de pull request a partir das seguintes mensagens de commit:\n\n${commitsData.join(
@@ -74,7 +104,68 @@ function useChat() {
 
     const assistantRespId = addMessage("assistant", " ");
 
+    const session = authStore.getSession();
+
+    const createResp = await fetch("http://localhost:3000/chats/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: session.userId,
+        messages: [...getMessages()],
+      }),
+    });
+
     return assistantRespId;
+  };
+
+  const getChats = async () => {
+    const session = authStore.getSession();
+    const userId = session.userId;
+
+    const resp = await fetch("http://localhost:3000/chats?userId=" + userId);
+
+    if (!resp.ok) {
+      throw new Error("Client Error: cannot retrive the saveds chats");
+    }
+
+    const chats = await resp.json();
+
+    return chats || [];
+  };
+
+  const getSavedMessages = async (chatId) => {
+    const chats = await getChats();
+    const chat = chats.find((c) => c.id == chatId);
+
+    if (!chat)
+      throw new Error("Client error: cannot recovery the required chat");
+
+    const messages = chat.messages;
+
+    return messages || [];
+  };
+
+  const loadChat = async (inputId) => {
+    const prevChatId = getChatId();
+
+    if (!inputId && prevChatId.length == 0) {
+      const chats = await getChats();
+
+      if (chats.length == 0) {
+        router.push("pullrequest.html");
+        return;
+      }
+
+      router.push("chat?chatid=" + chats[0].id);
+      return;
+    }
+
+    if (prevChatId !== inputId) {
+      const savedMessges = await getSavedMessages(inputId);
+      setMessages(savedMessges);
+    }
+
+    store.setState("chat-id", inputId);
   };
 
   return {
@@ -83,6 +174,9 @@ function useChat() {
     addMessage,
     clear,
     updateMessage,
-    prepareChat
+    prepareChat,
+    getChats,
+    loadChat,
+    saveMessages,
   };
 }
