@@ -1,4 +1,4 @@
-window.useRouter = () => {
+function useRouter() {
   const getQueryParam = (key) => {
     const params = new URLSearchParams(window.location.search);
     return params.get(key);
@@ -23,4 +23,6 @@ window.useRouter = () => {
     getUrl,
     onPopState,
   };
-};
+}
+
+window.useRouter = useRouter;

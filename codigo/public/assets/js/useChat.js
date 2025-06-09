@@ -9,7 +9,7 @@ function useChat() {
   };
 
   const getChatId = () => {
-    return store.GetState("chat-id");
+    return store.getState("chat-id") || "";
   };
 
   const getMessages = () => {
@@ -39,7 +39,7 @@ function useChat() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...chat,
-        messages: currentMessages,
+        messages: [...currentMessages],
       }),
     });
 
@@ -106,14 +106,23 @@ function useChat() {
 
     const session = authStore.getSession();
 
+    const generatedID = window.generateUUID();
+
     const createResp = await fetch("http://localhost:3000/chats/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        id: generatedID,
         userId: session.userId,
         messages: [...getMessages()],
       }),
     });
+
+    if (!createResp.ok) {
+      throw new Error("Client error: cannot create a new chat");
+    }
+
+    store.setState("chat-id", generatedID);
 
     return assistantRespId;
   };
@@ -156,16 +165,17 @@ function useChat() {
         return;
       }
 
-      router.push("chat?chatid=" + chats[0].id);
+      router.push("chat.html?chatid=" + chats[0].id);
       return;
     }
 
-    if (prevChatId !== inputId) {
+    if (inputId && prevChatId != inputId) {
       const savedMessges = await getSavedMessages(inputId);
       setMessages(savedMessges);
+      store.setState("chat-id", inputId);
     }
 
-    store.setState("chat-id", inputId);
+    chatUI.render();
   };
 
   return {
