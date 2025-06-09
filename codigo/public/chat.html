@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <!-- Metadados básicos e imports -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pull Request Generator App</title>
+    
+    <!-- CSS e bibliotecas JS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Scripts locais para funcionalidades específicas -->
     <script src="./assets/js/openai.js"></script>
     <script src="./assets/js/useState.js"></script>
     <script src="./assets/js/useChat.js"></script>
@@ -13,16 +17,20 @@
     <script src="./assets/js/jobsProcessor.js"></script>
     <script src="./assets/js/github.js"></script>
     <script src="./assets/js/data/basePrompt.js"></script>
+    <!-- Bibliotecas externas -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/codigo/public/assets/js/useRouter.js"></script>
 </head>
 
+<!-- Estrutura principal -->
 <body class="bg-white min-h-screen flex flex-col">
+    <!-- Cabeçalho -->
     <nav class="w-full shadow-sm px-6 py-4 bg-white flex justify-between items-center">
         <h1 class="text-xl font-semibold text-blue-600">Pull Request Generator</h1>
         <a href="/login" class="text-white bg-blue-600 px-4 py-2 rounded">Login</a>
     </nav>
 
+    <!-- Área do chat -->
     <main class="flex-1 flex justify-center items-start py-10 px-4">
         <div id="chat-container" class="w-full max-w-3xl bg-gray-50 shadow-md rounded-lg p-6 flex flex-col space-y-4">
             <div id="chat-messages" class="flex flex-col space-y-2 overflow-y-auto max-h-[70vh]"></div>
@@ -33,10 +41,12 @@
         </div>
     </main>
 
+    <!-- Rodapé -->
     <footer class="text-center text-sm text-gray-500 py-6">
         © 2025 Pull Request Generator. Todos os direitos reservados.
     </footer>
+    
+    <!-- Script principal do chat -->
     <script src="./assets/js/chat.js"></script>
 </body>
-
 </html>
