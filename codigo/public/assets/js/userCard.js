@@ -23,7 +23,7 @@ function UserCard() {
       const card = $(`
         <div id="user-card" class="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2 shadow-sm cursor-pointer hover:bg-gray-200 transition">
           <img src="${user.avatar}" alt="Avatar do GitHub" class="w-9 h-9 rounded-full border border-gray-300" />
-          <span class="text-sm font-medium text-gray-800">@${user.username}</span>
+          <span class="text-sm font-medium text-gray-800">@${session.username || user.username}</span>
         </div>
       `);
 

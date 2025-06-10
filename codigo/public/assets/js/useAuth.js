@@ -159,6 +159,36 @@ function useAuth() {
     }, 1000);
   };
 
+  const updateUser = async (updatedFields) => {
+    const session = store.getState("session");
+    if (!session) {
+      throw new Error(
+        "Client Error: Sessão não encontrada. Faça login novamente."
+      );
+    }
+
+    const userId = session.userId;
+
+    const response = await fetch(`http://localhost:3000/users/${userId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedFields),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erro ao atualizar os dados do usuário.");
+    }
+
+    const updatedUser = await response.json();
+
+    store.setState("session", {
+      ...session,
+      ...updatedFields,
+    });
+
+    return updatedUser;
+  };
+
   return {
     login,
     setToken,
@@ -166,6 +196,7 @@ function useAuth() {
     getUserMetadata,
     getSession,
     logOut,
+    updateUser,
   };
 }
 

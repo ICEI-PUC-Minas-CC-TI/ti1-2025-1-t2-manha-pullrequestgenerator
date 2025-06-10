@@ -132,7 +132,7 @@
             }
 
             /* ---------- Save ---------- */
-            $('#settings-form').on('submit', function (e) {
+            $('#settings-form').on('submit', async function (e) {
                 e.preventDefault();
 
                 // Atualiza sessão local
@@ -141,7 +141,11 @@
                     username: $('#username').val().trim(),
                     token: $('#gh-token').val().trim(),
                 };
-                store.setState('session', updatedSession);
+
+                await auth.updateUser({
+                    username: updatedSession.username,
+                    token: updatedSession.token
+                });
 
                 // Guardar chaves de API
                 store.setState('apiKeys', {
@@ -151,6 +155,7 @@
                 });
 
                 alert('Configurações salvas com sucesso!');
+                router.push('index.html')
             });
 
             /* ---------- Cancel ---------- */
