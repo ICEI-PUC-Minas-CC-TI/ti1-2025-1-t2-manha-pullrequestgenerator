@@ -8,11 +8,10 @@
 </head>
 <body>
     <script src="assets/js/useAuth.js"></script>
-    <script src="assets/js/useRouter.js"></script> <script>
+    <script src="assets/js/useRouter.js"></script>
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             const { isAuthenticated } = useAuth();
-            
-            
             const router = window.useRouter();
 
             if (!isAuthenticated()) {
@@ -39,5 +38,6 @@
     <script src="assets/js/openai.js"></script>
     <script src="assets/js/useState.js"></script>
     <script src="assets/js/generateUUID.js"></script>
+
 </body>
 </html>

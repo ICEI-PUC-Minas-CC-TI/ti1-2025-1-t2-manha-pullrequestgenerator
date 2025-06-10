@@ -1,7 +1,6 @@
-// codigo/public/assets/js/useRouter.js
-
 const useRouter = () => {
-    const push = (path) => { // Renomeado de navigateTo para push
+    
+    const push = (path) => {
         window.location.href = path;
     };
 
@@ -10,10 +9,9 @@ const useRouter = () => {
     };
 
     return {
-        push, // Retorna a função push
+        push,
         getCurrentPath
     };
 };
 
-// Expõe useRouter globalmente para ser acessível via window.useRouter()
 window.useRouter = useRouter;

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+
     const { isAuthenticated } = useAuth();
-    
-    const router = window.useRouter(); 
+    const router = window.useRouter();
 
     if (isAuthenticated()) {
         router.push('chat.html');
