@@ -26,9 +26,17 @@ function useChatUI(r) {
             ? "bg-blue-100 self-end text-right"
             : "bg-gray-200 self-start text-left";
 
+        let content = msg.content;
+        const prLinkRegex = /Link do PR:\s*(https?:\/\/\S+)/;
+        if (prLinkRegex.test(content)) {
+          content = content.replace(prLinkRegex, (match, url) => {
+            return `Link do PR: <a href="${url}" class="text-blue-500 underline" target="_blank">${url}</a>`;
+          });
+        }
+
         const message = $(`
                     <div id="message-${msg.id}" class="rounded-lg px-4 py-2 ${messageClass} max-w-[80%]">
-                        <p class="text-sm">${msg.content}</p>
+                        <p class="text-sm">${content}</p>
                     </div>
                 `);
         container.append(message);
