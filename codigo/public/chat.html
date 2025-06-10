@@ -17,6 +17,7 @@
     <script src="./assets/js/github.js"></script>
     <script src="./assets/js/data/basePrompt.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="assets/js/userCard.js"></script>
 
 </head>
 
@@ -59,7 +60,7 @@
     <div class="flex-1 ml-64 flex flex-col min-h-screen">
         <nav class="w-full shadow-sm px-6 py-4 bg-white flex justify-between items-center">
             <h1 class="text-xl font-semibold text-blue-600">Pull Request Generator</h1>
-            <a href="/login" class="text-white bg-blue-600 px-4 py-2 rounded">Login</a>
+            <div id="userContainer" class="relative"></div>
         </nav>
 
         <main class="flex-1 flex justify-center items-start py-10 px-4">
