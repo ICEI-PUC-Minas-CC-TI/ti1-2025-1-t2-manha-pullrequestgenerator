@@ -137,6 +137,8 @@ function useAuth() {
       router.push("login.html");
     }
 
+    if (!session) return null;
+
     const now = new Date();
     const expiration = new Date(session.expiration);
 
@@ -151,8 +153,10 @@ function useAuth() {
   };
 
   const logOut = () => {
-    store.SetState("session", null);
-    router.push("index.html");
+    localStorage.removeItem("session");
+    setTimeout(() => {
+      router.push("index.html");
+    }, 1000);
   };
 
   return {
