@@ -1,202 +1,131 @@
-$(document).ready(function () {
-  // Carrega organizações quando o token muda
-  $("#githubToken").on("change", function () {
-    fetchOrganizations();
-  });
+// Cache para armazenar repositórios e branches
+let currentRepos = [], allBranches = [];
 
-  // Carrega repositórios quando a organização muda
-  $("#organizacao").on("change", function () {
-    loadRepositories($("#organizacao").val().trim());
-  });
-
-  // Autocomplete para repositórios
-  $("#repositorio")
-    .autocomplete({
-      minLength: 0,
-      source: function (request, response) {
-        const results = $.grep(
-          currentRepos.map((r) => r.name),
-          function (repo) {
-            return repo.toLowerCase().includes(request.term.toLowerCase());
-          }
-        );
-        response(results);
-      },
-      select: function (event, ui) {
-        $("#repositorio").val(ui.item.value);
-        fetchBranches();
-        return false;
-      },
-    })
-    .focus(function () {
-      $(this).autocomplete("search", "");
-    });
-
-  // Autocomplete para branches
-  $("#branch_base, #branch_comparacao")
-    .autocomplete({
-      minLength: 0,
-      source: function (request, response) {
-        const results = $.grep(allBranches, function (branch) {
-          return branch.toLowerCase().includes(request.term.toLowerCase());
-        });
-        response(results);
-      },
-    })
-    .focus(function () {
-      $(this).autocomplete("search", "");
-    });
-});
-
-let currentRepos = [];
-let allBranches = [];
-
-// Busca as organizações do usuário e popula o select
+// Busca organizações do usuário
 async function fetchOrganizations() {
-  const token = $("#githubToken").val().trim();
-  if (!token) return;
+    const token = $("#githubToken").val().trim();
+    if (!token) return;
 
-  try {
-    const user = await githubFetch("https://api.github.com/user");
-    const orgs = await githubFetch("https://api.github.com/user/orgs");
-    const organizations = [{ login: user.login, name: user.login }, ...orgs];
-
-    const orgSelect = $("#organizacao");
-    orgSelect.html('<option value="">Select organization</option>');
-    organizations.forEach((org) => {
-      orgSelect.append(`<option value="${org.login}">${org.login}</option>`);
-    });
-  } catch (error) {
-    alert("Error loading organizations: " + error.message);
-  }
+    try {
+        const [user, orgs] = await Promise.all([
+            githubFetch("https://api.github.com/user"),
+            githubFetch("https://api.github.com/user/orgs")
+        ]);
+        
+        $("#organizacao").html('<option value="">Select organization</option>')
+            .append([{ login: user.login }, ...orgs]
+                .map(org => `<option value="${org.login}">${org.login}</option>`));
+    } catch (error) {
+        alert("Error loading organizations: " + error.message);
+    }
 }
 
-// Carrega os repositórios da organização selecionada
+// Carrega repositórios selecionados
 async function loadRepositories(org) {
-  const token = $("#githubToken").val().trim();
-  if (!token || !org) return;
+    const token = $("#githubToken").val().trim();
+    if (!token || !org) return;
 
-  try {
-    currentRepos = [];
-    $("#repositorio").val("");
-    $("#repositorio").prop("disabled", true);
+    try {
+        currentRepos = [];
+        $("#repositorio").val("").prop("disabled", true);
 
-    const userData = await githubFetch("https://api.github.com/user");
-    const username = userData.login;
+        const user = await githubFetch("https://api.github.com/user");
+        const url = org === user.login 
+            ? `https://api.github.com/users/${user.login}/repos?per_page=100`
+            : `https://api.github.com/orgs/${org}/repos?per_page=100`;
 
-    let repos;
+        currentRepos = (await githubFetch(url))
+            .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
-    if (org === username) {
-      // Repositórios do usuário
-      repos = await githubFetch(
-        `https://api.github.com/users/${username}/repos?per_page=100`
-      );
-    } else {
-      // Repositórios da organização
-      repos = await githubFetch(
-        `https://api.github.com/orgs/${org}/repos?per_page=100`
-      );
+        $("#repositorio").prop("disabled", false)
+            .autocomplete("option", "source", currentRepos.map(r => r.name));
+    } catch (error) {
+        alert("Error loading repositories: " + error.message);
     }
-
-    repos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-    currentRepos = repos;
-
-    $("#repositorio").prop("disabled", false);
-    $("#repositorio").autocomplete(
-      "option",
-      "source",
-      currentRepos.map((r) => r.name)
-    );
-  } catch (error) {
-    alert("Error loading repositories: " + error.message);
-  }
 }
 
-// Busca branches do repositório selecionado
+// Busca todas as branches do repositório
 async function fetchBranches() {
-  const token = $("#githubToken").val().trim();
-  const org = $("#organizacao").val().trim();
-  const repo = $("#repositorio").val().trim();
-
-  if (!token || !org || !repo) return;
-
-  try {
-    let branches = [];
-    let page = 1;
-    let fetched;
-
-    do {
-      fetched = await githubFetch(
-        `https://api.github.com/repos/${org}/${repo}/branches?per_page=100&page=${page}`
-      );
-      branches = branches.concat(fetched);
-      page++;
-    } while (fetched.length === 100);
-
-    allBranches = branches.map((branch) => branch.name);
-    $("#branch_base, #branch_comparacao").autocomplete(
-      "option",
-      "source",
-      allBranches
-    );
-    $("#branch_base, #branch_comparacao").val("");
-  } catch (error) {
-    alert("Error loading branches: " + error.message);
-  }
-}
-
-// Função para chamadas autenticadas à API do GitHub
-function githubFetch(url) {
-  const token = $("#githubToken").val().trim();
-  return fetch(url, {
-    headers: {
-      Authorization: `token ${token}`,
-    },
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.status}`);
-    }
-    return response.json();
-  });
-}
-
-// Valida se todos os campos obrigatórios foram preenchidos
-function validateForm() {
-  const organizacao = $("#organizacao").val().trim();
-  const repositorio = $("#repositorio").val().trim();
-  const branch_base = $("#branch_base").val().trim();
-  const branch_comparacao = $("#branch_comparacao").val().trim();
-
-  if (!organizacao || !repositorio || !branch_base || !branch_comparacao) {
-    alert("All fields must be filled.");
-    return false;
-  }
-
-  return true;
-}
-
-$("#Submit").on("click", function (e) {
-  e.preventDefault();
-
-  if (validateForm()) {
-    const store = window.useState();
-
-    const jobsProcessor = window.newJobsProcessor(store);
-
     const token = $("#githubToken").val().trim();
     const org = $("#organizacao").val().trim();
     const repo = $("#repositorio").val().trim();
-    const baseBranch = $("#branch_base").val().trim();
-    const headBranch = $("#branch_comparacao").val().trim();
+    if (!token || !org || !repo) return;
 
-    jobsProcessor.addJob({
-      owner: org,
-      repo: repo,
-      githubToken: token,
-      baseBranch: baseBranch,
-      headBranch: headBranch,
+    try {
+        let branches = [], page = 1, fetched;
+        do {
+            fetched = await githubFetch(
+                `https://api.github.com/repos/${org}/${repo}/branches?per_page=100&page=${page++}`
+            );
+            branches = branches.concat(fetched);
+        } while (fetched.length === 100);
+
+        allBranches = branches.map(b => b.name);
+        ["#branch_base", "#branch_comparacao"].forEach(selector => {
+            $(selector).autocomplete("option", "source", allBranches).val("");
+        });
+    } catch (error) {
+        alert("Error loading branches: " + error.message);
+    }
+}
+
+// Faz requisições autenticadas para a API do GitHub
+function githubFetch(url) {
+    return fetch(url, {
+        headers: { Authorization: `token ${$("#githubToken").val().trim()}` }
+    }).then(res => res.ok ? res.json() : Promise.reject(`GitHub API error: ${res.status}`));
+}
+
+// Valida se o formulário está preenchido
+function validateForm() {
+    const fields = ["organizacao", "repositorio", "branch_base", "branch_comparacao"];
+    if (fields.some(field => !$(`#${field}`).val().trim())) {
+        alert("All fields must be filled.");
+        return false;
+    }
+    return true;
+}
+
+// Configuração inicial da página
+$(function() {
+    // Eventos para carregar dados conforme seleção do usuário
+    $("#githubToken").on("change", fetchOrganizations);
+    $("#organizacao").on("change", () => loadRepositories($("#organizacao").val().trim()));
+    // Submissão do formulário
+    $("#Submit").on("click", e => {
+        e.preventDefault();
+        if (validateForm()) {
+            const store = window.useState();
+            window.newJobsProcessor(store).addJob({
+                owner: $("#organizacao").val().trim(),
+                repo: $("#repositorio").val().trim(),
+                githubToken: $("#githubToken").val().trim(),
+                baseBranch: $("#branch_base").val().trim(),
+                headBranch: $("#branch_comparacao").val().trim()
+            });
+            window.location.href = "/chat.html";
+        }
     });
 
-    window.location.href = "/chat.html";
-  }
+    // Autocomplete para repositórios
+    $("#repositorio").autocomplete({
+        minLength: 0,
+        source: (req, res) => res($.grep(
+            currentRepos.map(r => r.name), 
+            repo => repo.toLowerCase().includes(req.term.toLowerCase())
+        ),
+        select: (e, ui) => {
+            $(e.target).val(ui.item.value);
+            fetchBranches();
+            return false;
+        }
+    }).focus(function() { $(this).autocomplete("search", ""); });
+
+    $("#branch_base, #branch_comparacao").autocomplete({
+        minLength: 0,
+        source: (req, res) => res($.grep(
+            allBranches, 
+            b => b.toLowerCase().includes(req.term.toLowerCase()))
+        )
+    }).focus(function() { $(this).autocomplete("search", ""); });
 });
