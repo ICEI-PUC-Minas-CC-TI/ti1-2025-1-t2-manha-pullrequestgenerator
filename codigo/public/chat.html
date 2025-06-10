@@ -90,7 +90,7 @@
             const chatId = router.query("chatid");
 
             const githubClient = window.newGithub();
-            const openaiConnector = window.createOpenAIConnector("API_KEY_HERE");
+            const openaiConnector = window.createOpenAIConnector(chatStore.getState(apiKeys).openai);
 
             openaiConnector.setModel("chatgpt-4o-latest");
             let job = {};
@@ -182,7 +182,6 @@
                 $('#feedback-form').remove();
 
                 await chat.saveMessages();
-
             });
         })
     </script>
