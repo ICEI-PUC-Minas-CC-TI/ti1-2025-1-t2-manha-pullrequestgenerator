@@ -131,8 +131,11 @@ function useAuth() {
 
   const getSession = () => {
     const session = store.getState("session");
+    const path = router.getPath();
 
-    if (!session) return null;
+    if (!session && path != "/" && path != "/index.html") {
+      router.push("login.html");
+    }
 
     const now = new Date();
     const expiration = new Date(session.expiration);
