@@ -23,7 +23,7 @@ $(document).ready(function () {
           .addClass("text-green-500")
           .text("Cadastro realizado com sucesso!");
         $("#registerForm")[0].reset();
-        window.location.href = "index.html";
+        window.location.href = "pullrequest.html";
       } else {
         message.addClass("text-red-500").text("Erro ao cadastrar.");
       }
