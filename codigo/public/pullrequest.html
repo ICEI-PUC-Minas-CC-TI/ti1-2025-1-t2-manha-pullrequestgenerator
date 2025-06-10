@@ -12,15 +12,28 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="./assets/js/jobsProcessor.js"></script>
     <script src="./assets/js/useState.js"></script>
+    <script src="./assets/js/useRouter.js"></script>
+    <script src="./assets/js/useAuth.js"></script>
+    <script src="./assets/js/userCard.js"></script>
 
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 flex flex-col items-center min-h-screen py-10">
 
-    <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+<body class="bg-white min-h-screen flex flex-col">
+
+    <header class="flex items-center justify-between px-6 py-4 shadow-md">
+    <h1 class="text-lg font-semibold text-blue-600">Pull Request Generator</h1>
+    <div class="flex items-center gap-4">
+      <div id="userContainer" class="relative"></div>
+    </div>
+    </header>
+
+
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
         <h1 class="text-2xl font-bold text-center mb-6">Gerar Descrição de Pull Request</h1>
 
         <!-- Campo para o token do GitHub -->
