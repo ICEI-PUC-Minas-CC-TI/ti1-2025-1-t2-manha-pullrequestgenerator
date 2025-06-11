@@ -92,7 +92,7 @@ function useChat() {
     );
   };
 
-  const prepareChat = async (commitsData) => {
+  const prepareChat = async (commitsData, repo) => {
     clear();
 
     const prompt = `Gerar uma descrição de pull request a partir das seguintes mensagens de commit:\n\n${commitsData.join(
@@ -108,13 +108,26 @@ function useChat() {
 
     const generatedID = window.generateUUID();
 
+    const now = new Date();
+    const formattedDate = now.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    const name = `${repo} - ${formattedDate}`;
+
     const createResp = await fetch("http://localhost:3000/chats/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: generatedID,
         userId: session.userId,
+        name,
         messages: [...getMessages()],
+        createdAt: now,
       }),
     });
 
@@ -188,5 +201,6 @@ function useChat() {
     getChats,
     loadChat,
     saveMessages,
+    getChatId
   };
 }

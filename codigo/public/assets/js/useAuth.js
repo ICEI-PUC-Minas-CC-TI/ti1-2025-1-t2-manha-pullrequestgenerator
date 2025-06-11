@@ -131,6 +131,11 @@ function useAuth() {
 
   const getSession = () => {
     const session = store.getState("session");
+    const path = router.getPath();
+
+    if (!session && path != "/" && path != "/index.html") {
+      router.push("login.html");
+    }
 
     if (!session) return null;
 
@@ -148,8 +153,40 @@ function useAuth() {
   };
 
   const logOut = () => {
-    store.SetState("session", null);
-    router.push("index.html");
+    localStorage.removeItem("session");
+    setTimeout(() => {
+      router.push("index.html");
+    }, 1000);
+  };
+
+  const updateUser = async (updatedFields) => {
+    const session = store.getState("session");
+    if (!session) {
+      throw new Error(
+        "Client Error: Sessão não encontrada. Faça login novamente."
+      );
+    }
+
+    const userId = session.userId;
+
+    const response = await fetch(`http://localhost:3000/users/${userId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedFields),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erro ao atualizar os dados do usuário.");
+    }
+
+    const updatedUser = await response.json();
+
+    store.setState("session", {
+      ...session,
+      ...updatedFields,
+    });
+
+    return updatedUser;
   };
 
   return {
@@ -159,6 +196,7 @@ function useAuth() {
     getUserMetadata,
     getSession,
     logOut,
+    updateUser,
   };
 }
 

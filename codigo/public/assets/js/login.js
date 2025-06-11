@@ -23,7 +23,7 @@ $(document).ready(function () {
       if (user) {
         message.addClass("text-green-500").text("Login realizado com sucesso!");
         setTimeout(() => {
-          window.location.href = "index.html";
+          window.location.href = "pullrequest.html";
         }, 1000);
       } else {
         message.addClass("text-red-500").text("Senha incorreta.");
