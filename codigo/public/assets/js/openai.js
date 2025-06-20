@@ -9,7 +9,6 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
   return {
     apiKey,
     model: defaultModel,
-    provider: "openai",
     messages: [],
 
     /**
@@ -18,14 +17,6 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
      */
     setModel(newModel) {
       this.model = newModel;
-    },
-
-    setProvider(newProvider){
-      if (["openai, grok"].includes(newProvider)){
-        this.provider = newProvider;
-      } else{
-        throw new Error ("Provedor inválido.");
-      }
     },
 
     /**
@@ -44,36 +35,19 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
       this.messages = [];
     },
 
-    /**
-     * Send a message stream request to the API provider.
-     * @param {string} msgId - An identifier for the message stream.
-     * @param {function} callback - Called with each streamed delta.
-     * @param {Array} [messages] - Optional override for the messages array.
-     */
-
     async send(msgId, callback, messages) {
-      const isGrok = this.provider === "grok";
-      const endpoint = isGrok
-        ? "https://api.x.ai/v1/chat/completions"
-        : "https://api.openai.com/v1/chat/completions";
-
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-      };
-
-      const body = JSON.stringify({
-        model: this.model,
-        stream: true,
-        messages: messages || this.messages,
-      });
-
-      const resp = await fetch(endpoint, {
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
-        headers,
-        body,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: this.model,
+          stream: true,
+          messages: messages ? messages : this.messages,
+        }),
       });
-
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
