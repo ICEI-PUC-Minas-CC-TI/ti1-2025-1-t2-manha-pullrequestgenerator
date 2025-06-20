@@ -158,6 +158,22 @@ Com a crescente adoção de DevOps e práticas ágeis, essa automação represen
 ---
 
 ### Plano de testes
+teste da criação de conta:
+1.	clicar em criar conta, fornecer o token do github com autorização pra ver emai 
+2.	escrever PR e olhar metadata e commit statuses
+resultado esperado: criação da conta concluída te permitindo acesso ao resto do site
+
+teste da tela de edição do usuário:
+1.	criar conta clicar no avatar e verificar a edição e impacto da edição do usuário
+resultado esperado: abrir tela de configurações do usuário com edição
+
+teste da API Key:
+1.  fornecer API Key
+resultado esperado: Salvar API Key
+
+teste de uso da API:
+1.  testar o chat voltando pra tela iniciando e clicando em começar agora
+resultado esperado: API key entrar em uso 
 ---
 
 ### Registro de testes
