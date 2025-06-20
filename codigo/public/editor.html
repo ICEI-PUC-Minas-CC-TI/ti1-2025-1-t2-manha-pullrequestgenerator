@@ -34,3 +34,11 @@
         <label for="template" class="block text-sm font-medium mb-1">Template (Markdown)</label>
         <textarea id="template" rows="10" class="w-full px-3 py-2 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Escreva aqui o markdown que será usado no pull request..."></textarea>
+
+        <div class="mt-2 flex justify-end gap-3 text-sm text-blue-600">
+          <button type="button" id="preview-btn" class="hover:underline">Pré-visualizar</button>
+          <button type="button" id="edit-btn" class="hidden hover:underline">Editar</button>
+        </div>
+
+        <div id="markdown-preview" class="prose prose-sm max-w-none mt-4 p-4 border rounded bg-gray-50 hidden"></div>
+      </div>
