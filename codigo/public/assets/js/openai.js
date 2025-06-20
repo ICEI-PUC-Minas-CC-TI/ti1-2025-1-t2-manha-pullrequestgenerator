@@ -9,6 +9,7 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
   return {
     apiKey,
     model: defaultModel,
+    provider: "openai",
     messages: [],
 
     /**
@@ -18,6 +19,14 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
     setModel(newModel) {
       this.model = newModel;
     },
+
+    setProvider(newProvider){
+      if (["openai, grok"].includes(newProvider)){
+        this.provider = newProvider;
+      } else{
+        throw new Error ("Provedor inválido.")
+      }
+    }
 
     /**
      * Add a chat message to the queue.
