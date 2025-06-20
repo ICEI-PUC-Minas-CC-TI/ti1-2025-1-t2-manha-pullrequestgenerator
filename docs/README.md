@@ -166,9 +166,20 @@ teste do chat:
 mensagem enviada aparece, mensagem recebida aparece, conteúdo da mensagem correto.
 resultado: sucesso.
 ![alt text](image-28.png)
-
+teste do formuláro de seleção do pull  request:
+seleção funcionando, comparação funcionando, adquirindo os commits.
+resultado: sucesso.
 ![alt text](image-29.png)
+teste do formulário de login + chaves
+login funcional, key não conectando apropriadamente.
+resultado: falha
+teste do formulário de login + chaves 2:
+login funcional e key funcional
+resultado: sucesso
 ![alt text](image-30.png)
+teste tela inicial:
+confere se o usuário ja esta logado e caso não esteja envia para o formulaio de login.
+resultado: sucesso
 ---
 
 ### Projeto de interfaces
