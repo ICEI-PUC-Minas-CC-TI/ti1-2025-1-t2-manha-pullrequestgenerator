@@ -52,18 +52,28 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
      */
 
     async send(msgId, callback, messages) {
-      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: this.model,
-          stream: true,
-          messages: messages ? messages : this.messages,
-        }),
+      const isGrok = this.provider === "grok";
+      const endpoint = isGrok
+        ? "https://api.x.ai/v1/chat/completions"
+        : "https://api.openai.com/v1/chat/completions";
+
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
+      };
+
+      const body = JSON.stringify({
+        model: this.model,
+        stream: true,
+        messages: messages || this.messages,
       });
+
+      const resp = await fetch(endpoint, {
+        method: "POST",
+        headers,
+        body,
+      });
+
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
