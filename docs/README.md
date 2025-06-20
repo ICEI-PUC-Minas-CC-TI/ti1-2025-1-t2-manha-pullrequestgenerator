@@ -157,6 +157,12 @@ Com a crescente adoção de DevOps e práticas ágeis, essa automação represen
 ![alt text](image-21.png)
 ---
 
+### Plano de testes
+---
+
+### Registro de testes
+---
+
 ### Projeto de interfaces
 Artefatos relacionados com a interface e a interacão do usuário na proposta de solução.
 ---
