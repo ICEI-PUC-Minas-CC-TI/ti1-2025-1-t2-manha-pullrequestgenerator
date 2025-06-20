@@ -5,11 +5,11 @@
  * @param {string} [defaultModel="gpt-3.5-turbo"] - The default model to use.
  * @returns {Object} - A connector with methods to manage messages and send requests.
  */
-function createOpenAIConnector(apiKey, defaultModel = "gpt-4o") {
+function createOpenAIConnector(apiKey, defaultModel = "gpt-4o", baseUrl) {
   return {
+    baseUrl,
     apiKey,
     model: defaultModel,
-    provider: "openai",
     messages: [],
 
     /**
@@ -19,21 +19,6 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-4o") {
     setModel(newModel) {
       this.model = newModel;
     },
-
-    setProvider(newProvider) {
-      const validProviders = {
-        openai: "gpt-4o",
-        grok: "grok-1.5",
-        deepseek: "deepseek-chat",
-      };
-
-      if (!valid.includes(newProvider)) {
-        throw new Error("Provedor inválido.");
-      }
-      
-      this.provider = newProvider;
-      this.model = validProviders[newProvider];
-   },
 
     /**
      * Add a chat message to the queue.
@@ -79,7 +64,7 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-4o") {
         messages: messages || this.messages,
       });
 
-      const resp = await fetch(endpoint, {
+      const resp = await fetch(baseUrl, {
         method: "POST",
         headers,
         body,

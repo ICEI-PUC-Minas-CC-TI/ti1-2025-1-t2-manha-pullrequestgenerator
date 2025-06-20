@@ -90,22 +90,30 @@
             const chatId = router.query("chatid");
 
             const githubClient = window.newGithub();
-            const provider = chat.store.getState("provider") || "openai";
-            const apikeys = chat.store.getState("apikeys") || {};
-            const modelMap = {
-                openai: "gpt-4o", 
-                grok: "grok-1.5",
-                deepseek: "deepseek-chat"
-            };
 
+            const apikeys = chat.store.getState("apikeys") || {};
+            const modelId = chat.store.getState("ai-model") || "gpt-4o";
+
+            const models = [
+                { id: "gpt-4o", provider: "openai" }
+            ];
+
+            const model = models.find(c => c.id == modelId);
+
+            const provider = model.provider;
+
+            const providersMap = {
+                openai: window.createOpenIAConnector(apikeys[provider], "gpt-4o", "https://api.openai.com/v1/chat/completions"),
+                xai: window.createOpenIAConnector(apikeys[provider], "grok-3", "https://api.x.ai/v1/chat/completions"),
+                deepseek: window.createOpenIAConnector(apikeys[provider], "deepseek-chat", "https://api.deepseek.com/chat/completions"),
+            };
+            
             if (!apiKeys[provider]) {
                 alert(`API key não encontrada para o provedor: ${provider}`);
                 return;
             }
 
-            const connector = window.createOpenIAConnector(apiKeys[provider]);
-            connector.setProvider(provider);
-            connector.setModel(modelMap[provider]);
+            const connector = providersMap[provider];
 
             let job = {};
 

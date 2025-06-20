@@ -133,10 +133,16 @@ function useAuth() {
     const session = store.getState("session");
     const path = router.getPath();
 
-    if (!session && path != "/" && path != "/index.html") {
+    if (
+      !session &&
+      path != "/" &&
+      path != "/index.html" &&
+      path != "/login.html" &&
+      path != "register.html" &&
+      path != "token.html"
+    ) {
       router.push("login.html");
     }
-
     if (!session) return null;
 
     const now = new Date();
