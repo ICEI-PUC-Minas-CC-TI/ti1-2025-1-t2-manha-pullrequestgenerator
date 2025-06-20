@@ -38,3 +38,8 @@ Gere um Pull Request em markdown com base nas seguintes informações:
       const salvo = localStorage.getItem("promptCustomizado");
       if (salvo) promptEditor.value = salvo;
     };
+
+    function salvarPrompt() {
+      localStorage.setItem("promptCustomizado", promptEditor.value);
+      alert("Prompt salvo com sucesso!");
+    }
