@@ -43,3 +43,19 @@ Gere um Pull Request em markdown com base nas seguintes informações:
       localStorage.setItem("promptCustomizado", promptEditor.value);
       alert("Prompt salvo com sucesso!");
     }
+
+    function mostrarPreview() {
+      const modelo = promptEditor.value;
+      const substituido = modelo
+        .replace('{{commits}}', '- feat: tela de login\n- fix: erro ao deletar repositório')
+        .replace('{{tipo}}', 'feature')
+        .replace('{{escopo}}', 'autenticação')
+        .replace('{{branch}}', 'feat/login-system')
+        .replace('{{descricao}}', 'Implementação da tela de login com autenticação');
+
+      previewDiv.classList.remove("hidden");
+      previewDiv.textContent = substituido;
+    }
+  </script>
+</body>
+</html>
