@@ -23,7 +23,7 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
     setProvider(newProvider) {
       const valid = ["openai", "grok", "deepseek"];
       if (!valid.includes(newProvider)) {
-        throw new Error("Provedor inválido. Use 'openai', 'grok' ou 'deepseek'.");
+        throw new Error("Provedor inválido.");
       }
       this.provider = newProvider;
     },
@@ -44,6 +44,13 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
       this.messages = [];
     },
 
+    /**
+     * Send a message stream request to the API provider.
+     * @param {string} msgId - An identifier for the message stream.
+     * @param {function} callback - Called with each streamed delta.
+     * @param {Array} [messages] - Optional override for the messages array.
+     */
+    
     async send(msgId, callback, messages) {
       const resp = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
