@@ -103,10 +103,11 @@
             const provider = model.provider;
 
             const providersMap = {
-                openai: window.createOpenIAConnector(apikeys[provider], "gpt-4o", "https://api.openai.com/v1/chat/completions"),
-                xai: window.createOpenIAConnector(apikeys[provider], "grok-3", "https://api.x.ai/v1/chat/completions"),
-                deepseek: window.createOpenIAConnector(apikeys[provider], "deepseek-chat", "https://api.deepseek.com/chat/completions"),
+                openai: window.createOpenAIConnector(apikeys["openai"], "gpt-4o", "https://api.openai.com/v1/chat/completions"),
+                xai: window.createOpenAIConnector(apikeys["xai"], "grok-3", "https://api.x.ai/v1/chat/completions"),
+                deepseek: window.createOpenAIConnector(apikeys["deepseek"], "deepseek-chat", "https://api.deepseek.com/chat/completions"),
             };
+
             
             if (!apiKeys[provider]) {
                 alert(`API key não encontrada para o provedor: ${provider}`);

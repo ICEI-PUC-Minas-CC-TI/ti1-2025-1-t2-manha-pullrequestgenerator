@@ -44,14 +44,6 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-4o", baseUrl) {
      */
 
     async send(msgId, callback, messages) {
-      const provider = this.provider;
-
-      const endpoint = {
-        openai: "https://api.openai.com/v1/chat/completions",
-        grok: "https://api.x.ai/v1/chat/completions",
-        deepseek: "https://api.deepseek.com/chat/completions"
-      }[provider];
-
 
       const headers = {
         "Content-Type": "application/json",
