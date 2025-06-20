@@ -9,6 +9,7 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
   return {
     apiKey,
     model: defaultModel,
+    provider: "openai",
     messages: [],
 
     /**
@@ -17,6 +18,14 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
      */
     setModel(newModel) {
       this.model = newModel;
+    },
+
+    setProvider(newProvider) {
+      const valid = ["openai", "grok", "deepseek"];
+      if (!valid.includes(newProvider)) {
+        throw new Error("Provedor inválido. Use 'openai', 'grok' ou 'deepseek'.");
+      }
+      this.provider = newProvider;
     },
 
     /**
