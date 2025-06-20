@@ -161,6 +161,14 @@ Com a crescente adoção de DevOps e práticas ágeis, essa automação represen
 ---
 
 ### Registro de testes
+![alt text](image-27.png)
+teste do chat:
+mensagem enviada aparece, mensagem recebida aparece, conteúdo da mensagem correto.
+resultado: sucesso.
+![alt text](image-28.png)
+
+![alt text](image-29.png)
+![alt text](image-30.png)
 ---
 
 ### Projeto de interfaces
