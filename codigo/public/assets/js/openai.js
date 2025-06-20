@@ -52,11 +52,15 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
      */
 
     async send(msgId, callback, messages) {
-      const isGrok = this.provider === "grok";
-      const endpoint = isGrok
-        ? "https://api.x.ai/v1/chat/completions"
-        : "https://api.openai.com/v1/chat/completions";
+      const provider = this.provider;
 
+      const endpoint = {
+        openai: "https://api.openai.com/v1/chat/completions",
+        grok: "https://api.x.ai/v1/chat/completions",
+        deepseek: "https://api.deepseek.com/chat/completions"
+      }[provider];
+
+      
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.apiKey}`,
