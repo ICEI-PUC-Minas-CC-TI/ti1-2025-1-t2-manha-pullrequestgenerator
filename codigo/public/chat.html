@@ -95,9 +95,21 @@
             const modelId = chat.store.getState("ai-model") || "gpt-4o";
 
             const models = [
-                { id: "gpt-4o", provider: "openai" }
-            ];
+                // OpenAI
+                { id: "gpt-4", name: "GPT-4", provider: "openai", endpoint: "https://api.openai.com/v1/chat/completions" },
+                { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", provider: "openai", endpoint: "https://api.openai.com/v1/chat/completions" },
+                { id: "gpt-4o", name: "GPT-4o", provider: "openai", endpoint: "https://api.openai.com/v1/chat/completions" },
 
+                // xAI (Grok)
+                { id: "grok-1", name: "Grok-1", provider: "xai", endpoint: "https://api.x.ai/v1/chat/completions" },
+                { id: "grok-3", name: "Grok-3", provider: "xai", endpoint: "https://api.x.ai/v1/chat/completions" },
+                
+
+                // DeepSeek
+                { id: "deepseek-chat", name: "DeepSeek Chat", provider: "deepseek", endpoint: "https://api.deepseek.com/chat/completions" },
+                { id: "deepseek-coder", name: "DeepSeek Coder", provider: "deepseek", endpoint: "https://api.deepseek.com/chat/completions" },
+            ];
+            
             const model = models.find(c => c.id == modelId);
 
             const provider = model.provider;
@@ -114,7 +126,7 @@
                 return;
             }
 
-            const connector = providersMap[provider];
+            const connector = window.createOpenAIConnector(apikeys[provider], model.id, model.endpoint);
 
             let job = {};
 
