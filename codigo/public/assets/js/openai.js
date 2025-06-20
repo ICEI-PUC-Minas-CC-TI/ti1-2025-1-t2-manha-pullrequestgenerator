@@ -21,12 +21,19 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
     },
 
     setProvider(newProvider) {
-      const valid = ["openai", "grok", "deepseek"];
+      const validProviders = {
+        openai: "gpt-3.5-turbo",
+        grok: "grok-1",
+        deepseek: "deepseek-chat",
+      };
+
       if (!valid.includes(newProvider)) {
         throw new Error("Provedor inválido.");
       }
+      
       this.provider = newProvider;
-    },
+      this.model = validProviders[newProvider];
+   },
 
     /**
      * Add a chat message to the queue.
@@ -60,7 +67,7 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
         deepseek: "https://api.deepseek.com/chat/completions"
       }[provider];
 
-      
+
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.apiKey}`,
