@@ -5,7 +5,7 @@
  * @param {string} [defaultModel="gpt-3.5-turbo"] - The default model to use.
  * @returns {Object} - A connector with methods to manage messages and send requests.
  */
-function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
+function createOpenAIConnector(apiKey, defaultModel = "gpt-4o") {
   return {
     apiKey,
     model: defaultModel,
@@ -22,8 +22,8 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-3.5-turbo") {
 
     setProvider(newProvider) {
       const validProviders = {
-        openai: "gpt-3.5-turbo",
-        grok: "grok-1",
+        openai: "gpt-4o",
+        grok: "grok-1.5",
         deepseek: "deepseek-chat",
       };
 

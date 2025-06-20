@@ -90,9 +90,23 @@
             const chatId = router.query("chatid");
 
             const githubClient = window.newGithub();
-            const openaiConnector = window.createOpenAIConnector(chatStore.getState("apiKeys").openai);
+            const provider = chat.store.getState("provider") || "openai";
+            const apikeys = chat.store.getState("apikeys") || {};
+            const modelMap = {
+                openai: "gpt-4o", 
+                grok: "grok-1.5",
+                deepseek: "deepseek-chat"
+            };
 
-            openaiConnector.setModel("chatgpt-4o-latest");
+            if (!apiKeys[provider]) {
+                alert(`API key não encontrada para o provedor: ${provider}`);
+                return;
+            }
+
+            const connector = window.createOpenIAConnector(apiKeys[provider]);
+            connector.setProvider(provider);
+            connector.setModel(modelMap[provider]);
+
             let job = {};
 
             const queue = chatStore.getState("queue");
@@ -115,7 +129,7 @@
 
                 const assistantRespId = await chat.prepareChat(commitsData, repo);
 
-                await openaiConnector.send(assistantRespId, (msgId, chunck) => {
+                await connector.send(assistantRespId, (msgId, chunck) => {
                     chat.updateMessage(msgId, chunck)
                 }, [
                     ...chat.getMessages().map(c => ({ role: c.role, content: c.content })),
@@ -137,7 +151,7 @@
 
                 const respId = chat.addMessage('assistant', '');
 
-                await openaiConnector.send(respId, (msgId, chunck) => {
+                await connector.send(respId, (msgId, chunck) => {
                     chat.updateMessage(msgId, chunck)
                 }, [
                     ...chat.getMessages().map(c => ({ role: c.role, content: c.content })),
