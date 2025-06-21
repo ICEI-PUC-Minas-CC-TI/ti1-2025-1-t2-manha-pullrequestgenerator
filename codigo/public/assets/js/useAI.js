@@ -44,7 +44,8 @@ function useAI() {
 
   const getConnector = () => {
     const currentModel = getCurrentModel();
-    return currentModel ? providersMap[currentModel] : null;
+
+    return currentModel ? providersMap[currentModel.provider] : null;
   };
 
   const setModel = (model) => {
