@@ -19,6 +19,9 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="assets/js/userCard.js"></script>
     <script src="./assets/js/useChatSettings.js"></script>
+    <script src="assets/js/data/models.js"></script>
+    <script src="assets/js/useAI.js"></script>
+
 
 </head>
 
@@ -41,7 +44,7 @@
         background-color: transparent;
     }
 </style>
-</head>
+
 
 <body class="bg-white min-h-screen flex">
     <!-- Sidebar -->
@@ -68,6 +71,8 @@
             <div id="chat-container"
                 class="w-full max-w-3xl bg-gray-50 shadow-md rounded-lg p-6 flex flex-col space-y-4">
                 <div id="chat-messages" class="flex flex-col space-y-2 overflow-y-auto max-h-[70vh]"></div>
+                <!-- Opções serão adicionadas via JS -->
+
                 <form id="chat-form" class="flex space-x-2">
                     <input type="text" id="chat-input" class="flex-1 border rounded px-4 py-2 focus:outline-none"
                         placeholder="Digite sua mensagem...">
@@ -87,13 +92,13 @@
             const chatStore = window.useState();
             const router = window.useRouter();
             const chatUI = window.useChatUI(chat);
+            const githubClient = window.newGithub();
 
             const chatId = router.query("chatid");
 
-            const githubClient = window.newGithub();
-            const openaiConnector = window.createOpenAIConnector(chatStore.getState("apiKeys").openai);
+            const AI = window.useAI();
+            const connector = AI.getConnector();
 
-            openaiConnector.setModel("chatgpt-4o-latest");
             let job = {};
 
             const queue = chatStore.getState("queue");
@@ -116,7 +121,7 @@
 
                 const assistantRespId = await chat.prepareChat(commitsData, repo);
 
-                await openaiConnector.send(assistantRespId, (msgId, chunck) => {
+                await connector.send(assistantRespId, (msgId, chunck) => {
                     chat.updateMessage(msgId, chunck)
                 }, [
                     ...chat.getMessages().map(c => ({ role: c.role, content: c.content })),
@@ -138,7 +143,7 @@
 
                 const respId = chat.addMessage('assistant', '');
 
-                await openaiConnector.send(respId, (msgId, chunck) => {
+                await connector.send(respId, (msgId, chunck) => {
                     chat.updateMessage(msgId, chunck)
                 }, [
                     ...chat.getMessages().map(c => ({ role: c.role, content: c.content })),
