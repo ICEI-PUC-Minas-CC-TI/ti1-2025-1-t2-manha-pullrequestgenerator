@@ -26,18 +26,18 @@ function useAI() {
 
   const providersMap = {
     openai: window.createOpenAIConnector(
+      getCurrentModel,
       apikeys["openai"],
-      "gpt-4o",
       "https://api.openai.com/v1/chat/completions"
     ),
     xai: window.createOpenAIConnector(
+      getCurrentModel,
       apikeys["xai"],
-      "grok-3",
       "https://api.x.ai/v1/chat/completions"
     ),
     deepseek: window.createOpenAIConnector(
+      getCurrentModel,
       apikeys["deepseek"],
-      "deepseek-chat",
       "https://api.deepseek.com/chat/completions"
     ),
   };
@@ -47,9 +47,14 @@ function useAI() {
     return currentModel ? providersMap[currentModel] : null;
   };
 
+  const setModel = (model) => {
+    store.setState("current-ai-model", model);
+  };
+
   return {
     models: availableModels,
     getConnector,
+    setModel,
   };
 }
 

@@ -5,20 +5,11 @@
  * @param {string} [defaultModel="gpt-3.5-turbo"] - The default model to use.
  * @returns {Object} - A connector with methods to manage messages and send requests.
  */
-function createOpenAIConnector(apiKey, defaultModel = "gpt-4o", baseUrl) {
+function createOpenAIConnector(apiKey, getModel, baseUrl) {
   return {
     baseUrl,
     apiKey,
-    model: defaultModel,
     messages: [],
-
-    /**
-     * Set a different model for subsequent requests.
-     * @param {string} newModel
-     */
-    setModel(newModel) {
-      this.model = newModel;
-    },
 
     /**
      * Add a chat message to the queue.
@@ -51,7 +42,7 @@ function createOpenAIConnector(apiKey, defaultModel = "gpt-4o", baseUrl) {
       };
 
       const body = JSON.stringify({
-        model: this.model,
+        model: getModel(),
         stream: true,
         messages: messages || this.messages,
       });
