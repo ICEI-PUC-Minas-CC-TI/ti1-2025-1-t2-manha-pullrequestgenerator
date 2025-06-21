@@ -17,9 +17,8 @@
     }
   ]
   "config": {
-      "template": "### Descrição do PR\nEste PR implementa melhorias e novos recursos relacionados ao módulo de cartão de crédito...\n\n#### Novidades\n- Ajustes no cálculo de limite\n- DTOs para novas operações\n- Correções de typos no middleware\n\n#### Testes recomendados\n- CRUD completo com novos DTOs\n- Testes nos métodos de parcelamento",
-      "base_prompt": "Você é um assistant capaz de analisar commits de forma técnica e objetiva...",
-      "analysis_prompt": "Analise os commits buscando entender o objetivo das alterações...",
-      "description_prompt": "Com base na análise, gere uma descrição clara e profissional para o PR..."
+      "id" = "",
+      "template": "",
+      "basePrompt": "",
   }
 }
