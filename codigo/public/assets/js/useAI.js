@@ -26,18 +26,18 @@ function useAI() {
 
   const providersMap = {
     openai: window.createOpenAIConnector(
-      getCurrentModel,
       apikeys["openai"],
+       getCurrentModel,
       "https://api.openai.com/v1/chat/completions"
     ),
     xai: window.createOpenAIConnector(
-      getCurrentModel,
       apikeys["xai"],
+      getCurrentModel,
       "https://api.x.ai/v1/chat/completions"
     ),
     deepseek: window.createOpenAIConnector(
-      getCurrentModel,
       apikeys["deepseek"],
+      getCurrentModel,
       "https://api.deepseek.com/chat/completions"
     ),
   };

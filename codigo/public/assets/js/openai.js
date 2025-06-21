@@ -42,7 +42,7 @@ function createOpenAIConnector(apiKey, getModel, baseUrl) {
       };
 
       const body = JSON.stringify({
-        model: getModel(),
+        model: getModel().id,
         stream: true,
         messages: messages || this.messages,
       });
