@@ -40,7 +40,7 @@
         background-color: transparent;
     }
 </style>
-</head>
+
 
 <body class="bg-white min-h-screen flex">
     <!-- Sidebar -->
@@ -67,6 +67,16 @@
             <div id="chat-container"
                 class="w-full max-w-3xl bg-gray-50 shadow-md rounded-lg p-6 flex flex-col space-y-4">
                 <div id="chat-messages" class="flex flex-col space-y-2 overflow-y-auto max-h-[70vh]"></div>
+                <div class="mb-4">
+                    <label for="model-select" class="block text-sm font-medium text-gray-700 mb-1">Selecionar
+                        modelo</label>
+                    <select id="model-select" class="w-full border rounded px-3 py-2">
+                        <!-- Opções serão adicionadas via JS -->
+                    </select>
+                </div>
+
+                <!-- Opções serão adicionadas via JS -->
+
                 <form id="chat-form" class="flex space-x-2">
                     <input type="text" id="chat-input" class="flex-1 border rounded px-4 py-2 focus:outline-none"
                         placeholder="Digite sua mensagem...">
@@ -87,60 +97,58 @@
             const router = window.useRouter();
             const chatUI = window.useChatUI(chat);
 
-            const chatId = router.query("chatid");
-
-            const githubClient = window.newGithub();
-
-            const apikeys = chat.store.getState("apikeys") || {};
-            const modelId = chat.store.getState("ai-model") || "gpt-4o";
+            const apikeys = chatStore.getState("apiKeys") || {};
 
             const models = [
-                // OpenAI
                 { id: "gpt-4o", name: "GPT-4o", provider: "openai", endpoint: "https://api.openai.com/v1/chat/completions" },
                 { id: "gpt-4o-mini", name: "GPT-4o mini", provider: "openai", endpoint: "https://api.openai.com/v1/chat/completions" },
-
-                // xAI (Grok)
                 { id: "grok-1.5", name: "Grok-1.5", provider: "xai", endpoint: "https://api.x.ai/v1/chat/completions" },
                 { id: "grok-3", name: "Grok-3", provider: "xai", endpoint: "https://api.x.ai/v1/chat/completions" },
-                
-
-                // DeepSeek
                 { id: "deepseek-chat", name: "DeepSeek Chat", provider: "deepseek", endpoint: "https://api.deepseek.com/chat/completions" },
                 { id: "deepseek-coder", name: "DeepSeek Coder", provider: "deepseek", endpoint: "https://api.deepseek.com/chat/completions" },
             ];
 
-            models.forEach(m => {
-                $('#model-select').append(`<option value="${m.id}">${m.name} (${m.provider})</option>`);
-            });
+           const availableModels = models.filter(m => apikeys[m.provider]);
 
-            $('#save-model-btn').on('click', () => {
-                const selectedId = $('#model-select').val();
-                const selectedModel = models.find(m => m.id === selectedId);
-                const apiKey = $('#apikey-input').val().trim();
-                
-                if (!selectedModel || !apiKey) {
-                    alert("Por favor, selecione um modelo e forneça a API key.");
-                    return;
-                }
-                
-                const apikeys = chat.store.getState("apikeys") || {};
-                apikeys[selectedModel.provider] = apiKey;
-                
-                chat.store.setState("apikeys", apikeys);
-                chat.store.setState("ai-model", selectedModel.id);
-                
-                alert(`Configurações salvas para o modelo ${selectedModel.name}.`);
-                location.reload();
-            });
-            
-            const model = models.find(c => c.id == modelId);
+if (availableModels.length === 0) {
+    alert("Nenhuma API key encontrada. Vá até as configurações para adicionar.");
+    return;
+}
 
-            if (!model){
+// Preenche o select com os modelos disponíveis
+availableModels.forEach(model => {
+    $('#model-select').append(
+        `<option value="${model.id}">${model.name}</option>`
+    );
+});
+
+// Pega o modelo salvo ou o primeiro da lista disponível
+let currentModelId = chat.store.getState("ai-model");
+if (!availableModels.find(m => m.id === currentModelId)) {
+    currentModelId = availableModels[0].id;
+    chat.store.setState("ai-model", currentModelId);
+}
+$('#model-select').val(currentModelId);
+
+// Atualiza o modelo quando o select muda
+$('#model-select').on('change', function () {
+    const selectedId = $(this).val();
+    chat.store.setState("ai-model", selectedId);
+    location.reload();
+});
+
+// Continua fluxo
+const chatId = router.query("chatid");
+const model = availableModels.find(m => m.id === currentModelId);
+            const provider = model.provider;
+
+
+            if (!model) {
                 alert("Modelo inválido ou não encontrado.");
                 return;
             }
 
-            const provider = model.provider;
+
 
             const providersMap = {
                 openai: window.createOpenAIConnector(apikeys["openai"], "gpt-4o", "https://api.openai.com/v1/chat/completions"),
@@ -148,11 +156,15 @@
                 deepseek: window.createOpenAIConnector(apikeys["deepseek"], "deepseek-chat", "https://api.deepseek.com/chat/completions"),
             };
 
-            
-            if (!apiKeys[provider]) {
-                alert(`API key não encontrada para o provedor: ${provider}`);
+
+            if (!apikeys[provider]) {
+                alert(`API key não encontrada para o provedor: ${provider}. Vá até as configurações para adicioná-la.`);
                 return;
             }
+
+            console.log("API Keys:", apikeys);
+            console.log("Available Models:", availableModels);
+
 
             const connector = window.createOpenAIConnector(apikeys[provider], model.id, model.endpoint);
 
