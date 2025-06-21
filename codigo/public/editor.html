@@ -97,43 +97,95 @@ Este PR implementa melhorias e novos recursos relacionados ao módulo de cartão
     $(function () {
       const auth = window.useAuth();
       const router = window.useRouter();
+      const { getState, setState } = useState();
 
-      // Preencher os campos com os dados padrão
-      $('#template').val(config.template);
-      $('#base_prompt').val(config.base_prompt);
-      $('#analysis_prompt').val(config.analysis_prompt);
-      $('#description_prompt').val(config.description_prompt);
+      // Carrega configurações salvas ou usa as padrão
+      function loadConfig() {
+      const savedConfig = getState('config');
+    
+      if (savedConfig) {
+        $('#template').val(savedConfig.template);
+        $('#base_prompt').val(savedConfig.basePrompt);
+        $('#analysis_prompt').val(savedConfig.analysisPrompt);
+        $('#description_prompt').val(savedConfig.descriptionPrompt);
+      } else {
+        // Usa valores padrão se não houver configuração salva
+        $('#template').val(config.template);
+        $('#base_prompt').val(config.base_prompt);
+        $('#analysis_prompt').val(config.analysis_prompt);
+        $('#description_prompt').val(config.description_prompt);
+      }
+    }
 
-      // Preview
-      $('#preview-btn').on('click', () => {
-        const html = marked.parse($('#template').val());
-        $('#markdown-preview').html(html).removeClass('hidden');
-        $('#template').addClass('hidden');
-        $('#preview-btn').addClass('hidden');
-        $('#edit-btn').removeClass('hidden');
-      });
+    // Carrega as configurações ao iniciar
+    loadConfig();
 
-      // Editar
-      $('#edit-btn').on('click', () => {
-        $('#markdown-preview').addClass('hidden');
-        $('#template').removeClass('hidden');
-        $('#edit-btn').addClass('hidden');
-        $('#preview-btn').removeClass('hidden');
-      });
-
-      // Salvar
-      $('#config-form').on('submit', function (e) {
-        e.preventDefault();
-        const updated = {
-          template: $('#template').val(),
-          base_prompt: $('#base_prompt').val(),
-          analysis_prompt: $('#analysis_prompt').val(),
-          description_prompt: $('#description_prompt').val(),
-        };
-        console.log('🧠 Configuração atualizada:', updated);
-        alert('Configuração salva com sucesso!');
-      });
+    // Preview
+    $('#preview-btn').on('click', () => {
+      const html = marked.parse($('#template').val());
+      $('#markdown-preview').html(html).removeClass('hidden');
+      $('#template').addClass('hidden');
+      $('#preview-btn').addClass('hidden');
+      $('#edit-btn').removeClass('hidden');
     });
+
+    // Editar
+    $('#edit-btn').on('click', () => {
+      $('#markdown-preview').addClass('hidden');
+      $('#template').removeClass('hidden');
+      $('#edit-btn').addClass('hidden');
+      $('#preview-btn').removeClass('hidden');
+    });
+
+    // Salvar
+    $('#config-form').on('submit', async function (e) {
+      e.preventDefault();
+    
+      const updated = {
+        id: getState('config')?.id || generateUniqueId(),
+        template: $('#template').val(),
+        basePrompt: $('#base_prompt').val(),
+        analysisPrompt: $('#analysis_prompt').val(),
+        descriptionPrompt: $('#description_prompt').val(),
+      };
+
+      try {
+        // Salva no localStorage
+        setState('config', updated);
+      
+        // Salva no backend (db.json)
+        await saveToBackend(updated);
+      
+        console.log('Configuração salva com sucesso:', updated);
+        alert('Configuração salva com sucesso!');
+      } catch (error) {
+        console.error('Erro ao salvar configuração:', error);
+        alert('Erro ao salvar configuração. Verifique o console para detalhes.');
+      }
+    });
+
+    // Função para salvar no backend (db.json)
+    async function saveToBackend(configData) {
+      const response = await fetch('http://localhost:3000/config', {
+        method: 'PUT', // Ou 'POST' se for criação
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(configData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao salvar no backend');
+      }
+
+      return response.json();
+    }
+
+    // Função auxiliar para gerar IDs únicos
+    function generateUniqueId() {
+      return Math.random().toString(36).substring(2) + Date.now().toString(36);
+    }
+  });
   </script>
 </body>
 
