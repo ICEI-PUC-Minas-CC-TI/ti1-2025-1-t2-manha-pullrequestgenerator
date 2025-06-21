@@ -17,8 +17,10 @@
     }
   ]
   "config": {
-      "id" = "",
+      "id" = "ahfdgsafjdgya-oi",
       "template": "",
       "basePrompt": "",
+      "analysisPrompt": "",
+      "descriptionPrompt": ""
   }
 }
