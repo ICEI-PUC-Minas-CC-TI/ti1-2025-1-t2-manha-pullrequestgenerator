@@ -339,3 +339,9 @@ percebemos que nao possuimos um feedback de eero adequado
 Resultado teste 1 -> sucesso, salvar login e cadastro funcionando 
 
 conclusões -> defeito de design encontrado, não há como retornar para essa pagina
+
+### testes do chat
+![alt text](/docs/image-30.png)
+resultado do teste 1 -> Suscetível a instabilidades do GitHub por ser dependente dele.
+
+conclusões -> 
