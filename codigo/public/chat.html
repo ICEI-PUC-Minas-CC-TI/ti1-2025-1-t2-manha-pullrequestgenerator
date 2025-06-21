@@ -61,6 +61,11 @@
         <nav class="w-full shadow-sm px-6 py-4 bg-white flex justify-between items-center">
             <h1 class="text-xl font-semibold text-blue-600">Pull Request Generator</h1>
             <div id="userContainer" class="relative"></div>
+            <div id="model-config" class="flex items-center gap-2 text-sm">
+                <select id="model-select" class="border px-2 py-1 rounded"></select>
+                <input id="apikey-input" type="text" class="border px-2 py-1 rounded w-64" placeholder="API Key do modelo escolhido" />
+                <button id="save-model-btn" class="bg-blue-600 text-white px-3 py-1 rounded">Salvar</button>
+            </div>
         </nav>
 
         <main class="flex-1 flex justify-center items-start py-10 px-4">
@@ -108,8 +113,37 @@
                 { id: "deepseek-chat", name: "DeepSeek Chat", provider: "deepseek", endpoint: "https://api.deepseek.com/chat/completions" },
                 { id: "deepseek-coder", name: "DeepSeek Coder", provider: "deepseek", endpoint: "https://api.deepseek.com/chat/completions" },
             ];
+
+            models.forEach(m => {
+                $('#model-select').append(`<option value="${m.id}">${m.name} (${m.provider})</option>`);
+            });
+
+            $('#save-model-btn').on('click', () => {
+                const selectedId = $('#model-select').val();
+                const selectedModel = models.find(m => m.id === selectedId);
+                const apiKey = $('#apikey-input').val().trim();
+                
+                if (!selectedModel || !apiKey) {
+                    alert("Por favor, selecione um modelo e forneça a API key.");
+                    return;
+                }
+                
+                const apikeys = chat.store.getState("apikeys") || {};
+                apikeys[selectedModel.provider] = apiKey;
+                
+                chat.store.setState("apikeys", apikeys);
+                chat.store.setState("ai-model", selectedModel.id);
+                
+                alert(`Configurações salvas para o modelo ${selectedModel.name}.`);
+                location.reload();
+            });
             
             const model = models.find(c => c.id == modelId);
+
+            if (!model){
+                alert("Modelo inválido ou não encontrado.");
+                return;
+            }
 
             const provider = model.provider;
 
