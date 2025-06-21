@@ -2,6 +2,7 @@ function useChat() {
   const store = window.useState();
   const authStore = window.useAuth();
   const router = window.useRouter();
+  const chatSettings = window.useChatSettings();
 
   const NewMessage = (role, content, shouldDisplay) => {
     const id = window.generateUUID();
@@ -93,18 +94,23 @@ function useChat() {
   };
 
   const prepareChat = async (commitsData, repo) => {
+    const session = authStore.getSession();
+
     clear();
 
     const prompt = `Gerar uma descrição de pull request a partir das seguintes mensagens de commit:\n\n${commitsData.join(
       "\n"
     )}`;
 
-    addContextMessage("system", window.basePrompt());
+    const basePrompt = await chatSettings.getPromptSettigs(
+      session.userId,
+      "string"
+    );
+
+    addContextMessage("system", basePrompt);
     addContextMessage("user", prompt);
 
     const assistantRespId = addMessage("assistant", " ");
-
-    const session = authStore.getSession();
 
     const generatedID = window.generateUUID();
 
@@ -201,6 +207,6 @@ function useChat() {
     getChats,
     loadChat,
     saveMessages,
-    getChatId
+    getChatId,
   };
 }

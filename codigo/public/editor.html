@@ -15,6 +15,10 @@
   <script src="./assets/js/useState.js"></script>
   <script src="./assets/js/useRouter.js"></script>
   <script src="./assets/js/userCard.js"></script>
+  <script src="./assets/js/data/basePrompt.js"></script>
+  <script src="./assets/js/useChatSettings.js"></script>
+  <script src="./assets/js/generateUUID.js"></script>
+
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col text-gray-900">
@@ -32,7 +36,8 @@
       <!-- Template Markdown -->
       <div>
         <label for="template" class="block text-sm font-medium mb-1">Template (Markdown)</label>
-        <textarea id="template" rows="10" class="w-full px-3 py-2 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <textarea id="template" rows="10"
+          class="w-full px-3 py-2 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Escreva aqui o markdown que será usado no pull request..."></textarea>
 
         <div class="mt-2 flex justify-end gap-3 text-sm text-blue-600">
@@ -46,19 +51,22 @@
       <!-- Prompts Personalizados -->
       <div>
         <label for="base_prompt" class="block text-sm font-medium mb-1">Base Prompt</label>
-        <textarea id="base_prompt" rows="4" class="w-full px-3 py-2 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <textarea id="base_prompt" rows="4"
+          class="w-full px-3 py-2 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Prompt base usado para orientar a IA..."></textarea>
       </div>
 
       <div>
         <label for="analysis_prompt" class="block text-sm font-medium mb-1">Analysis Prompt</label>
-        <textarea id="analysis_prompt" rows="4" class="w-full px-3 py-2 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <textarea id="analysis_prompt" rows="4"
+          class="w-full px-3 py-2 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Instruções para análise dos commits..."></textarea>
       </div>
 
       <div>
         <label for="description_prompt" class="block text-sm font-medium mb-1">Description Prompt</label>
-        <textarea id="description_prompt" rows="4" class="w-full px-3 py-2 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <textarea id="description_prompt" rows="4"
+          class="w-full px-3 py-2 border rounded resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Instruções para gerar a descrição do PR..."></textarea>
       </div>
 
@@ -77,32 +85,25 @@
   </footer>
 
   <script>
-    const config = {
-      template: `### Descrição do PR
-Este PR implementa melhorias e novos recursos relacionados ao módulo de cartão de crédito...
-
-#### Novidades
-- Ajustes no cálculo de limite
-- DTOs para novas operações
-- Correções de typos no middleware
-
-#### Testes recomendados
-- CRUD completo com novos DTOs
-- Testes nos métodos de parcelamento`,
-      base_prompt: "Você é um assistant capaz de analisar commits de forma técnica e objetiva...",
-      analysis_prompt: "Analise os commits buscando entender o objetivo das alterações...",
-      description_prompt: "Com base na análise, gere uma descrição clara e profissional para o PR..."
-    };
-
-    $(function () {
+    $(document).ready(async function () {
       const auth = window.useAuth();
       const router = window.useRouter();
 
-      // Preencher os campos com os dados padrão
-      $('#template').val(config.template);
-      $('#base_prompt').val(config.base_prompt);
-      $('#analysis_prompt').val(config.analysis_prompt);
-      $('#description_prompt').val(config.description_prompt);
+      const chatSettingsStore = window.useChatSettings();
+
+      // Carrega configurações salvas ou usa as padrão
+      async function loadConfig() {
+        const userId = auth.getSession().userId;
+        const savedConfig = await chatSettingsStore.getPromptSettigs(userId, 'JSON');
+
+        $('#template').val(savedConfig.template);
+        $('#base_prompt').val(savedConfig.basePrompt);
+        $('#analysis_prompt').val(savedConfig.analysisPrompt);
+        $('#description_prompt').val(savedConfig.descriptionPrompt);
+      }
+
+      // Carrega as configurações ao iniciar
+      await loadConfig();
 
       // Preview
       $('#preview-btn').on('click', () => {
@@ -122,16 +123,25 @@ Este PR implementa melhorias e novos recursos relacionados ao módulo de cartão
       });
 
       // Salvar
-      $('#config-form').on('submit', function (e) {
+      $('#config-form').on('submit', async function (e) {
         e.preventDefault();
-        const updated = {
-          template: $('#template').val(),
-          base_prompt: $('#base_prompt').val(),
-          analysis_prompt: $('#analysis_prompt').val(),
-          description_prompt: $('#description_prompt').val(),
-        };
-        console.log('🧠 Configuração atualizada:', updated);
-        alert('Configuração salva com sucesso!');
+
+        try {
+          await chatSettingsStore.updateChatSettings({
+            template: $('#template').val(),
+            basePrompt: $('#base_prompt').val(),
+            analysisPrompt: $('#analysis_prompt').val(),
+            descriptionPrompt: $('#description_prompt').val(),
+          }
+          );
+
+          alert('Configuração salva com sucesso!');
+
+          router.push("pullrequest.html")
+        } catch (error) {
+          console.error('Erro ao salvar configuração:', error);
+          alert('Erro ao salvar configuração. Verifique o console para detalhes.');
+        }
       });
     });
   </script>
