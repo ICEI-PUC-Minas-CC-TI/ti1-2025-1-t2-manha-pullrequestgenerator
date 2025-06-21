@@ -108,53 +108,53 @@ Com a crescente adoção de DevOps e práticas ágeis, essa automação represen
 ### **Matriz CSD e Mapa de Stakeholders**
 
 ![alt text](/docs/image.png)  
-![alt text](image-1.png)  
-![alt text](image-2.png)
+![alt text](/docs/image-1.png)  
+![alt text](/docs/image-2.png)
 
 ---
 
 ### **Entrevista qualititativa**
 
-![alt text](image-3.png)  
-![alt text](image-4.png)  
-![alt text](image-5.png)  
-![alt text](image-6.png)  
-![alt text](image-7.png)  
-![alt text](image-8.png)  
-![alt text](image-9.png)
+![alt text](/docs/image-3.png)  
+![alt text](/docs/image-4.png)  
+![alt text](/docs/image-5.png)  
+![alt text](/docs/image-6.png)  
+![alt text](/docs/image-7.png)  
+![alt text](/docs/image-8.png)  
+![alt text](/docs/image-9.png)
 
 ---
 
 ### **Personas e Propostas de valor**
 
-![alt text](image-10.png)  
-![alt text](image-11.png)  
-![alt text](image-12.png)  
-![alt text](image-13.png)  
-![alt text](image-14.png)  
-![alt text](image-15.png)
+![alt text](/docs/image-10.png)  
+![alt text](/docs/image-11.png)  
+![alt text](/docs/image-12.png)  
+![alt text](/docs/image-13.png)  
+![alt text](/docs/image-14.png)  
+![alt text](/docs/image-15.png)
 
 ---
 
 ### **Histórias de Usuários**
-![alt text](image-16.png)
+![alt text](/docs/image-16.png)
 ---
 
 ### **Requisitos da Plataforma**
 #### Requisitos Funcionais
-![alt text](image-18.png)
+![alt text](/docs/image-18.png)
 ---
 
 #### Requisitos não Funcionais
-![alt text](image-19.png)
+![alt text](/docs/image-19.png)
 ---
 
 ### Restrições do projeto
-![alt text](image-20.png)
+![alt text](/docs/image-20.png)
 ---
 
 ### Proposta de valor
-![alt text](image-21.png)
+![alt text](/docs/image-21.png)
 ---
 
 ### Projeto de interfaces
@@ -163,17 +163,17 @@ Artefatos relacionados com a interface e a interacão do usuário na proposta de
 
 ## Wireframes
 Estes são os protótipos de telas do sistema.
-![alt text](image-22.png)
-![alt text](image-23.png)
-![alt text](image-24.png)
-![alt text](image-25.png)
+![alt text](/docs/image-22.png)
+![alt text](/docs/image-23.png)
+![alt text](/docs/image-24.png)
+![alt text](/docs/image-25.png)
 
 ## Metodologia
 Detalhes sobre a organização do grupo e o ferramental empregado.
 
 ## notion
 Utilizado para subdividir as tasks semanais do grupo.
-![alt text](image-26.png)
+![alt text](/docs/image-26.png)
 
 ## Google meet
 Utilizado para realizar reuniões semanais com todo grupo.
@@ -298,38 +298,3 @@ Esta sprint foi o ponto central do desenvolvimento, onde as funcionalidades core
 * **Wireframes Detalhados:** Protótipos de tela para a interface de seleção de repositórios e branches, e para a interface de chat, garantindo uma User Experience (UX) bem definida.
 * **Estrutura de Dados para Chats:** Evolução do `db.json` para incluir o armazenamento do histórico de mensagens e chats, permitindo a persistência das interações com a IA.
 * **Prompt Base e Template de Geração de PRs:** Definição formal e refinada do `prompt` e `template` que orientam a IA na criação das descrições, assegurando consistência e alta qualidade do output.
-
-## Conclusão e Considerações Finais
-
-O desenvolvimento do **Pull Request Generator** representou um marco estratégico em nossa jornada de aprendizado e na aplicação prática de princípios de engenharia de software avançada e inteligência artificial. Este projeto não apenas validou a premissa fundamental de que a automação pode revolucionar processos rotineiros e dispendiosos no ciclo de desenvolvimento de software, mas também demonstrou, de forma inequívoca, o imenso potencial da IA para elevar a qualidade, a eficiência e a sinergia colaborativa em ambientes de código complexos.
-
-### Impacto Estratégico e Valor Agregado
-
-A solução arquitetada e implementada tem o potencial de impactar profundamente e transformar positivamente o fluxo de trabalho de desenvolvedores individuais e equipes de desenvolvimento, proporcionando valor agregado em múltiplas dimensões:
-
-* **Otimização Profunda do Tempo:** A capacidade de gerar descrições de *pull requests* de forma automatizada e inteligente resulta em uma redução exponencial do tempo e do esforço manual previamente dedicados a esta tarefa. Isso libera os desenvolvedores para concentrarem suas energias em atividades de maior valor agregado, como o desenvolvimento de funcionalidades inovadoras, a otimização de desempenho e a resolução de desafios arquitetônicos.
-* **Padronização Rigorosa e Qualidade Aprimorada:** A inteligência artificial incorporada garante que todas as descrições de *pull requests* adiram a um padrão consistente e rigoroso. Elas são formuladas para serem claras, abrangentes e incluem sistematicamente todas as informações pertinentes – desde a descrição de novos recursos e correções de bugs até instruções detalhadas de como testar as alterações –, elevando significativamente a qualidade e a utilidade dos *pull requests* como artefatos de comunicação e revisão de código.
-* **Mitigação de Erros e Consistência Operacional:** A automação inerente ao processo minimiza drasticamente a ocorrência de erros humanos e inconsistências que frequentemente surgem em processos manuais e repetitivos. Isso contribui para um fluxo de trabalho de integração mais robusto, preditivo e confiável.
-* **Fortalecimento da Colaboração e Aceleração da Revisão de Código:** *Pull requests* excepcionalmente bem descritos, com informações claras e concisas, simplificam e aceleram enormemente o processo de revisão de código. Isso não apenas promove uma colaboração mais fluida e eficiente entre os membros da equipe, mas também acelera o ciclo de feedback e contribui para a integração mais rápida e segura das alterações no repositório principal.
-
-### Desafios Arquitetônicos e Aprendizados Essenciais
-
-A jornada de desenvolvimento do Pull Request Generator foi pontuada por desafios técnicos complexos e decisões arquitetônicas cruciais, cada um se revelando uma oportunidade valiosa para aprofundar nosso conhecimento e aprimorar nossas habilidades:
-
-* **Integração Resiliente com APIs Externas (GitHub e OpenAI):** A interface com APIs de terceiros, como as do GitHub (para dados de repositório e commits) e da OpenAI (para a inteligência da geração de texto), exigiu um entendimento aprofundado de mecanismos de autenticação (tokens), gerenciamento de limites de requisição (*rate limits*), e manipulação robusta de respostas assíncronas. A implementação do `jobsProcessor.js` foi uma decisão arquitetônica chave para gerenciar uma fila de requisições, garantindo eficiência e resiliência frente às restrições das APIs externas.
-* **Gerenciamento de Estado Distribuído e Persistência Segura:** A necessidade de manter o estado da aplicação (sessões de usuário, histórico de chats, chaves de API) de forma persistente e segura no lado do cliente (`localStorage`) foi um desafio significativo. A arquitetura modular com `useState.js` foi essencial para um gerenciamento de estado desacoplado, enquanto a implementação de hashing para senhas no `useAuth.js` e a gestão inteligente da expiração de tokens mitigaram riscos de segurança.
-* **Engenharia de Prompt e Otimização da IA:** A calibração e o refinamento do `basePrompt.js` foram um processo altamente iterativo e uma demonstração prática da **Engenharia de Prompt**. Exigiu experimentação contínua e ajustes finos para que a IA gerasse descrições de Pull Request não apenas precisas e concisas, mas também aderentes ao template desejado e ao tom profissional, sublinhando a criticidade da formulação de prompts para o sucesso de aplicações baseadas em Grandes Modelos de Linguagem (LLMs).
-* **Desenvolvimento Colaborativo em Ecossistemas Ágeis:** A aplicação prática das metodologias ágeis (Design Thinking para concepção e Scrum para execução) e o uso estratégico de ferramentas de colaboração (GitHub para controle de versão e CI/CD, Notion para gestão de projetos, Google Meet para comunicação síncrona) foram cruciais. Essa sinergia manteve a equipe coesa, altamente produtiva e consistentemente alinhada com os objetivos e a visão estratégica do projeto, promovendo um ambiente de trabalho verdadeiramente sinérgico.
-
-### Perspectivas Futuras e Visão de Evolução
-
-O **Pull Request Generator**, em sua arquitetura atual, estabelece uma base sólida e flexível para futuras expansões e aprimoramentos contínuos. A visão de longo prazo para o projeto inclui:
-
-* **Expansão para Multi-Plataformas:** Aumentar a compatibilidade do sistema para integrar-se com outras plataformas de versionamento de código proeminentes, como GitLab, Bitbucket e Azure DevOps, ampliando significativamente o alcance e a utilidade da ferramenta no mercado.
-* **Análise Semântica de Código e Refatoração Inteligente:** Aprimorar a capacidade da IA para realizar uma análise semântica mais profunda do código-fonte, identificando não apenas mudanças superficiais, mas também padrões de design, potenciais dívidas técnicas e gargalos de desempenho. Isso permitiria a sugestão de refatorações mais complexas e contextuais, elevando o nível de otimização de código.
-* **Personalização Avançada e Templates Dinâmicos:** Desenvolver um sistema robusto que permita que os usuários ou equipes personalizem em maior profundidade os templates de descrição dos Pull Requests, bem como as regras específicas para a geração de conteúdo pela IA, adaptando a ferramenta de forma granular às suas necessidades e estilos de codificação exclusivos.
-* **Interface de Usuário Evoluída e Analíticos:** Investir em melhorias significativas na experiência do usuário, como visualizações mais ricas e interativas do *diff* de código, opções de edição avançadas para as descrições geradas e a inclusão de *dashboards* de produtividade que ofereçam *insights* sobre a eficiência dos Pull Requests e o impacto da ferramenta.
-* **Modelos de IA Adaptativos e Auto-Otimizáveis:** Explorar a viabilidade de treinar e integrar modelos de IA específicos (ou ajustar modelos existentes via *fine-tuning*) para padrões de commit e estilos de código de equipes ou projetos específicos. Isso tornaria as sugestões da IA ainda mais precisas, personalizadas e contextualmente relevantes ao longo do tempo.
-* **Automação Extensiva em Workflows CI/CD:** Adicionar funcionalidades de notificação robustas e integrar o Pull Request Generator diretamente com pipelines de CI/CD (Integração Contínua/Entrega Contínua). Isso permitiria automatizar ainda mais o processo de criação, revisão e *merge* de Pull Requests, minimizando intervenção manual.
-
-Em suma, o Pull Request Generator não é meramente uma ferramenta de automação; ele personifica um avanço estratégico na forma como interagimos com o código e colaboramos em projetos de software. É um testemunho da capacidade de inovar e resolver problemas reais e recorrentes no ecossistema de desenvolvimento, alavancando o poder transformador da inteligência artificial e a sinergia exemplar de uma equipe dedicada e apaixonada por tecnologia. Estamos confiantes no potencial que este projeto oferece para pavimentar o caminho para um desenvolvimento de software mais inteligente, eficiente e colaborativo em escala global.
