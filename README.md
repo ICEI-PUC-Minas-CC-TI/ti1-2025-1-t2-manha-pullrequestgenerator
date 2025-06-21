@@ -320,10 +320,22 @@ Nesta sprint, o foco foi oferecer aos usuários maior autonomia, permitindo o us
 * **Template Dinâmico de Prompt**: Arquitetura que permite carregar, editar e salvar o prompt de cada usuário, proporcionando maior controle sobre a geração de textos pela IA.
 
 
-testes para integração multimodelos
+#### Registros de testes
+### testes para integração multimodelos
 ![alt text](/docs/image-31.png)
-a forma de passar o getmodel para o http de Ai estava errada
-problemas de integração
-erros desconhecidos de origem do github identificados como um erro de credencial do github
-caso use o githube e volte depos ira dar problema devido ao uso de uma variavel temporaria
+resultado do teste 1 -> a forma de passar o getmodel para o http de Ai estava errada
+
+resultado do teste 2 -> problemas de integração
+
+resultado do teste 3 -> erros desconhecidos de origem do github identificados como um erro de credencial do github
+
+resultado do teste 4 -> caso use o github e volte depos ira dar problema devido ao uso de uma variavel temporaria
+
+conclusões -> problemas resolvidos
+
 percebemos que nao possuimos um feedback de eero adequado
+### testes página inicial
+![alt text](/docs/image-27.png)
+Resultado teste 1 -> sucesso, salvar login e cadastro funcionando 
+
+conclusões -> defeito de design encontrado, não há como retornar para essa pagina
