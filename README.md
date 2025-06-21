@@ -233,7 +233,7 @@ A interface do usuário do Pull Request Generator foi meticulosamente construíd
 * **jQuery:** Empregado para facilitar a manipulação eficiente do DOM e para implementar interações dinâmicas nas páginas, como a lógica de formulários e os componentes de autocomplete.
 * **JavaScript Puro (ES6+):** A base da lógica interativa do frontend, organizada em módulos para promover a reusabilidade e a manutenibilidade do código:
     * `useAuth.js`: Gerencia todo o ciclo de autenticação e autorização do usuário, desde a validação do token do GitHub até o sistema de login e registro local. Incorpora hashing de senha (SHA-256) para garantir a segurança dos dados do usuário.
-    * `useState.js`: Implementa um mecanismo leve para gerenciamento de estado global e persistência de dados utilizando o `localStorage` do navegador, essencial para manter informações como a sessão do usuário e configurações.
+    * `useState.js`: Implementa um mecanismo leve para gerenciamento de estado global e persistência de dados dentro da aplicação, permitindo manter informações como sessão do usuário e preferências, mesmo durante a navegação entre páginas.
     * `useRouter.js`: Responsável pelo roteamento *client-side*, permitindo uma navegação suave e sem recarregamentos completos da página, melhorando a experiência do usuário.
     * `github.js`: Coleção de helpers para interagir de forma padronizada com a API REST do GitHub, incluindo funcionalidades para listar organizações, repositórios, branches e obter detalhes de commits.
     * `openai.js`: O módulo de integração direta com a API da OpenAI, encarregado de enviar os dados dos commits para a IA e receber em *stream* a descrição elaborada para o Pull Request.
@@ -247,7 +247,8 @@ A interface do usuário do Pull Request Generator foi meticulosamente construíd
 O **GitHub** foi a plataforma fundamental escolhida para o controle de versão do projeto. Sua robustez e recursos colaborativos permitiram à equipe:
 * Trabalhar de forma **colaborativa** em um ambiente centralizado.
 * **Rastrear e gerenciar todas as mudanças** no código-fonte ao longo do tempo.
-* Utilizar a metodologia de **branches** para isolar o desenvolvimento de novas funcionalidades e correções, garantindo que as alterações fossem revisadas e integradas de forma controlada e segura.
+* Utilizar a estratégia de **branches** para isolar novas funcionalidades e correções.
+* Realizar **revisões de código através de pull requests**, promovendo a análise, validação e melhoria contínua antes da integração das alterações ao código principal.
 
 ---
 
