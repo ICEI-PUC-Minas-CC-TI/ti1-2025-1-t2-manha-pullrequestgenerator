@@ -137,6 +137,11 @@
         router.push("chat.html");
       });
 
+      // Limpar: reseta para padrões salvos
+      $('#reset-btn').on('click', async () => {
+        await loadConfig();
+      });
+
       // Salvar
       $('#config-form').on('submit', async function (e) {
         e.preventDefault();
