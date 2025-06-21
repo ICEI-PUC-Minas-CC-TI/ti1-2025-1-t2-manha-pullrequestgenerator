@@ -122,17 +122,29 @@ Este PR implementa melhorias e novos recursos relacionados ao módulo de cartão
       });
 
       // Salvar
-      $('#config-form').on('submit', function (e) {
-        e.preventDefault();
-        const updated = {
-          template: $('#template').val(),
-          base_prompt: $('#base_prompt').val(),
-          analysis_prompt: $('#analysis_prompt').val(),
-          description_prompt: $('#description_prompt').val(),
-        };
-        console.log('🧠 Configuração atualizada:', updated);
+    $('#config-form').on('submit', function (e) {
+      e.preventDefault();
+      const updated = {
+        template: $('#template').val(),
+        base_prompt: $('#base_prompt').val(),
+        analysis_prompt: $('#analysis_prompt').val(),
+        description_prompt: $('#description_prompt').val(),
+      };
+
+      // Envia para o JSON Server (PUT para atualizar)
+      fetch('http://localhost:3000/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('✅ Configuração salva no JSON Server:', data);
         alert('Configuração salva com sucesso!');
-      });
+      })
+    .catch(error => console.error('Erro:', error));
+});
+
     });
   </script>
 </body>
