@@ -99,7 +99,13 @@ function useAuth() {
       return false;
     }
 
-    await login(email, password);
+    const user = await login(email, password);
+
+    if (window.useChatSettings) {
+      const chatSettingsStore = window.useChatSettings();
+
+      await chatSettingsStore.setupDefaultSettings(user.id);
+    }
 
     return true;
   };
