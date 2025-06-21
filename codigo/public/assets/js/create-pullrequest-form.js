@@ -117,6 +117,7 @@
     e.preventDefault();
     if (!validateForm()) return;
 
+    AI.setModel($("#models").val().trim());
     const jobsProcessor = window.newJobsProcessor(store);
     jobsProcessor.addJob({
       owner: $("#organizacao").val().trim(),
