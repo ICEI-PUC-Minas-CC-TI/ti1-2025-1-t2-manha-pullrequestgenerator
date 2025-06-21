@@ -70,18 +70,20 @@
           placeholder="Instruções para gerar a descrição do PR..."></textarea>
       </div>
 
-      <!-- Botão de salvar -->
       <div class="flex justify-between">
         <div class="flex gap-3">
+          <!-- Botão Cancelar -->
           <button type="button" id="cancel-btn" class="text-gray-600 hover:text-gray-900 px-4 py-2 rounded transition">
             Cancelar
           </button>
 
-          <button type="button" id="reset-btn" class="text-gray-600 hover:text-gray-900 px-4 py-2 rounded transition">
+          <!-- Botão Limpar -->
+          <button type="button" id="reset-btn" class="text-red-600 hover:text-red-800 px-4 py-2 rounded transition">
             Limpar
           </button>
         </div>
 
+        <!-- Botão Salvar -->
         <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
           Salvar Configuração
         </button>
@@ -139,7 +141,10 @@
 
       // Limpar: reseta para padrões salvos
       $('#reset-btn').on('click', async () => {
-        await loadConfig();
+        const confirmReset = confirm("Você tem certeza que deseja limpar os campos e restaurar os padrões?");
+        if (confirmReset) {
+          await loadConfig();
+        }
       });
 
       // Salvar
