@@ -107,7 +107,7 @@ Com a crescente adoção de DevOps e práticas ágeis, essa automação represen
 
 ### **Matriz CSD e Mapa de Stakeholders**
 
-![alt text](image.png)  
+![alt text](/docs/image.png)  
 ![alt text](image-1.png)  
 ![alt text](image-2.png)
 
