@@ -256,46 +256,57 @@ O **GitHub** foi a plataforma fundamental escolhida para o controle de versão d
 
 O desenvolvimento do Pull Request Generator foi estruturado em **sprints ágeis**, com foco em entregas incrementais e funcionais. Cada sprint representou um ciclo de trabalho com objetivos claros, culminando na adição de funcionalidades significativas. Abaixo, detalhamos as principais funcionalidades e artefatos entregues em cada fase, refletindo a progressão do projeto até o momento.
 
-### Sprint 1: Fundação e Autenticação
+### Sprint 1: Estrutura Inicial e Funcionamento com o Github
 
-Esta sprint inicial foi dedicada à construção da base sólida do sistema. O objetivo principal foi permitir que o usuário pudesse interagir com a plataforma através de mecanismos de autenticação seguros e gerenciar suas credenciais, além de estabelecer a conexão inicial com o ambiente do GitHub.
+Esta sprint inicial foi dedicada à construção da base sólida do sistema. O objetivo principal foi permitir que o usuário pudesse interagir com a plataforma através de mecanismos de autenticação via JSON server, além de estabelecer a conexão inicial com o ambiente do GitHub.
 
 #### Objetivos da Sprint:
 * Prover a infraestrutura essencial para autenticação de usuários.
 * Permitir o gerenciamento de tokens de acesso ao GitHub.
 * Estabelecer a base para a persistência de dados de sessão.
+* Fazer uma demonstração inicial das telas de geração de Pull Request e Chat
 
 #### Funcionalidades Entregues:
 * **Página de Entrada de Token GitHub (`token.html`):** Desenvolvida como o primeiro ponto de contato do usuário com a aplicação. Esta página é responsável por coletar e validar o Classic Token do GitHub, um requisito fundamental para que a aplicação possa realizar operações nas APIs do GitHub em nome do usuário.
 * **Módulos de Autenticação Completos (`login.html`, `register.html`):** Implementação das interfaces e lógicas de *frontend* e *backend* para o registro de novos usuários e o processo de login. Isso incluiu a validação de dados de entrada, armazenamento seguro de senhas por meio de hashing (utilizando a biblioteca `bcryptjs` em `register.js` e `login.js`), e o estabelecimento de sessões persistentes com base na expiração do token.
-* **Página de Configurações do Usuário (`settings.html`):** Uma interface dedicada onde o usuário pode visualizar e atualizar suas informações de perfil (username e email), e principalmente, gerenciar seu token do GitHub e as chaves de API para diferentes modelos de IA (OpenAI, DeepSeek, Grok).
-* **Infraestrutura de Gerenciamento de Estado e Roteamento:** Desenvolvimento de componentes fundamentais como `useState.js` para manipulação e persistência de dados na sessão do navegador (via `localStorage`), e `useRouter.js` para um controle de navegação eficiente entre as diferentes páginas da aplicação sem recarregamentos completos.
-
-#### Artefatos Criados:
-* **Wireframes e Esboços Iniciais:** Protótipos visuais para as telas de login, registro e entrada de token, servindo como blueprint para o desenvolvimento da interface.
-* **Estruturas de Dados Iniciais:** Definição da estrutura para o armazenamento de usuários e sessões no `db/db.json`.
-
-### Sprint 2: Integração GitHub e Geração Inteligente de PRs
-
-Esta sprint foi o ponto central do desenvolvimento, onde as funcionalidades core do Pull Request Generator foram implementadas. O foco foi a integração aprofundada com a API do GitHub e a aplicação de Inteligência Artificial para automatizar a criação de descrições de Pull Request.
-
-#### Objetivos da Sprint:
-* Permitir a seleção dinâmica de repositórios e branches do GitHub.
-* Implementar a lógica para comparar branches e obter os commits.
-* Integrar a aplicação com a IA para gerar descrições de Pull Request.
-* Prover uma interface de chat para interação com a IA e feedback.
-
-#### Funcionalidades Entregues:
 * **Interface de Seleção de Repositórios e Branches (`pullrequest.html`):** Desenvolvida uma interface intuitiva onde o usuário pode selecionar a organização e o repositório desejados. Os campos para `Repositório`, `Branch Base` e `Branch Comparação` utilizam um sistema de *autocomplete* dinâmico, que é preenchido com dados diretamente da API do GitHub, facilitando a busca e seleção.
 * **Mecanismo de Processamento de Jobs e Obtenção de Commits (`jobsProcessor.js`):** Implementado um sistema robusto de fila para gerenciar e processar as requisições assíncronas ao GitHub. Este módulo orquestra a busca dos commits que diferenciam a branch "base" da branch "comparação", extraindo metadados essenciais (SHA, mensagem, arquivos alterados) para a análise posterior pela IA.
 * **Geração de Descrição de Pull Request via IA (`chat.html`, `openai.js`, `basePrompt.js`):**
     * A funcionalidade central é acessível através de uma interface de chat dedicada (`chat.html`), que exibe a descrição gerada pela IA e permite a interação contínua com o assistente.
     * O módulo `openai.js` atua como o conector direto para a API da OpenAI, enviando os dados brutos dos commits e recebendo a descrição elaborada pela IA em um fluxo de dados (streaming).
     * O arquivo `basePrompt.js` contém a diretriz e o template rigorosos que guiam a IA na formatação da descrição do Pull Request. Este prompt garante que o resultado seja profissional, padronizado e altamente relevante para o contexto das alterações de código.
-    * Foram adicionadas funcionalidades de feedback direto na interface do chat, com botões para "Enviar" (confirmar a descrição e iniciar a criação do Pull Request real no GitHub) e "Cancelar" (descartar a descrição e o formulário de feedback).
+
+#### Artefatos Criados:
+* **Wireframes e Esboços Iniciais:** Protótipos visuais para as telas de login, registro e entrada de token, servindo como blueprint para o desenvolvimento da interface.
+* **Estruturas de Dados Iniciais:** Definição da estrutura para o armazenamento de usuários e sessões no `db/db.json`.
+
+### Sprint 2: Aperfeiçoamento da função de Chat e controle de navegação
+
+Faça uma descrição para essa sprint
+
+#### Objetivos da Sprint:
+* Disponibilizar uma sidebar que permite a visualisação do histórico de PullRequests feitos
+* Tornar a navegação do site eficiente
+* Permitir a manipulação e segurança de dados na sessão do navegador
+* Prover maior flexibilidade na edição de chats
+
+#### Funcionalidades Entregues:
+* **Infraestrutura de Gerenciamento de Estado e Roteamento:** Desenvolvimento de componentes fundamentais como `useState.js` para manipulação e persistência de dados na sessão do navegador, e `useRouter.js` para um controle de navegação eficiente entre as diferentes páginas da aplicação sem recarregamentos completos.
 * **Histórico Persistente de Chats:** Implementada a capacidade de salvar e carregar conversas anteriores com o assistente de IA. Isso permite que os usuários revisitem descrições geradas previamente, otimizando o fluxo de trabalho e evitando o reprocessamento de dados.
+      * Foram adicionadas funcionalidades de feedback direto na interface do chat, com botões para "Enviar" (confirmar a descrição e iniciar a criação do Pull    Request real no GitHub) e "Cancelar" (descartar a descrição e o formulário de feedback).
 
 #### Artefatos Criados:
 * **Wireframes Detalhados:** Protótipos de tela para a interface de seleção de repositórios e branches, e para a interface de chat, garantindo uma User Experience (UX) bem definida.
 * **Estrutura de Dados para Chats:** Evolução do `db.json` para incluir o armazenamento do histórico de mensagens e chats, permitindo a persistência das interações com a IA.
 * **Prompt Base e Template de Geração de PRs:** Definição formal e refinada do `prompt` e `template` que orientam a IA na criação das descrições, assegurando consistência e alta qualidade do output.
+
+### Sprint 3: Implementação de diferentes modelos e editor de template
+
+Faça uma descrição para essa sprint explicando como ela foi focada em dar acesso ao usuario de usar novos modelos como Deepseek e Grok fornecendo os tokens dessas aplicações e uma pagina de editor.html que permite editar a prompt de basePrompt.js para maior opções de costumização do usuario
+
+#### Objetivos da Sprint:
+* Adicione
+
+#### Funcionalidades Entregues:
+* **Página de Configurações do Usuário (`settings.html`):** Uma interface dedicada onde o usuário pode visualizar e atualizar suas informações de perfil (username e email), e principalmente, gerenciar seu token do GitHub e as chaves de API para diferentes modelos de IA (OpenAI, DeepSeek, Grok).
+* Adicione uma dessas para editor.html
