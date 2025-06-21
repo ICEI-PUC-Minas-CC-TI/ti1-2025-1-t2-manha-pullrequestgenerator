@@ -258,13 +258,13 @@ O desenvolvimento do Pull Request Generator foi estruturado em **sprints ágeis*
 
 ### Sprint 1: Estrutura Inicial e Funcionamento com o Github
 
-Esta sprint inicial foi dedicada à construção da base sólida do sistema. O objetivo principal foi permitir que o usuário pudesse interagir com a plataforma através de mecanismos de autenticação via JSON server, além de estabelecer a conexão inicial com o ambiente do GitHub.
+Esta sprint foi dedicada à construção da base do sistema, com foco em autenticação de usuários, integração inicial com o GitHub e demonstração das principais funcionalidades da plataforma.
 
 #### Objetivos da Sprint:
-* Prover a infraestrutura essencial para autenticação de usuários.
-* Permitir o gerenciamento de tokens de acesso ao GitHub.
-* Estabelecer a base para a persistência de dados de sessão.
-* Fazer uma demonstração inicial das telas de geração de Pull Request e Chat
+* Implementar o sistema de autenticação de usuários.
+* Permitir o gerenciamento seguro dos tokens de acesso ao GitHub.
+* Estabelecer uma prompt base para formatar os commits gerados.
+* Realizar uma primeira demonstração funcional das telas de geração de Pull Request e do Chat assistido por IA.
 
 #### Funcionalidades Entregues:
 * **Página de Entrada de Token GitHub (`token.html`):** Desenvolvida como o primeiro ponto de contato do usuário com a aplicação. Esta página é responsável por coletar e validar o Classic Token do GitHub, um requisito fundamental para que a aplicação possa realizar operações nas APIs do GitHub em nome do usuário.
@@ -282,31 +282,39 @@ Esta sprint inicial foi dedicada à construção da base sólida do sistema. O o
 
 ### Sprint 2: Aperfeiçoamento da função de Chat e controle de navegação
 
-Faça uma descrição para essa sprint
+Esta sprint teve como foco aprimorar a navegação da aplicação, oferecer um histórico acessível dos Pull Requests gerados e tornar o chat mais flexível e eficiente para os usuários.
 
 #### Objetivos da Sprint:
-* Disponibilizar uma sidebar que permite a visualisação do histórico de PullRequests feitos
-* Tornar a navegação do site eficiente
-* Permitir a manipulação e segurança de dados na sessão do navegador
-* Prover maior flexibilidade na edição de chats
+* Implementar uma sidebar para visualização do histórico de Pull Requests e chats anteriores.
+* Tornar a navegação fluida e sem recarregamento de páginas.
+* Estabelecer um gerenciamento eficiente de estado para manter dados da sessão.
+* Aumentar a flexibilidade na edição e no controle das interações no chat.
 
 #### Funcionalidades Entregues:
 * **Infraestrutura de Gerenciamento de Estado e Roteamento:** Desenvolvimento de componentes fundamentais como `useState.js` para manipulação e persistência de dados na sessão do navegador, e `useRouter.js` para um controle de navegação eficiente entre as diferentes páginas da aplicação sem recarregamentos completos.
 * **Histórico Persistente de Chats:** Implementada a capacidade de salvar e carregar conversas anteriores com o assistente de IA. Isso permite que os usuários revisitem descrições geradas previamente, otimizando o fluxo de trabalho e evitando o reprocessamento de dados.
-      * Foram adicionadas funcionalidades de feedback direto na interface do chat, com botões para "Enviar" (confirmar a descrição e iniciar a criação do Pull    Request real no GitHub) e "Cancelar" (descartar a descrição e o formulário de feedback).
+* **Aprimoramento do Chat (`chat.html`):** Inclusão de controles como “Enviar” (para criar o Pull Request no GitHub) e “Cancelar” (para descartar a descrição atual), além de melhorias na usabilidade e no fluxo de geração.
 
 #### Artefatos Criados:
-* **Wireframes Detalhados:** Protótipos de tela para a interface de seleção de repositórios e branches, e para a interface de chat, garantindo uma User Experience (UX) bem definida.
-* **Estrutura de Dados para Chats:** Evolução do `db.json` para incluir o armazenamento do histórico de mensagens e chats, permitindo a persistência das interações com a IA.
-* **Prompt Base e Template de Geração de PRs:** Definição formal e refinada do `prompt` e `template` que orientam a IA na criação das descrições, assegurando consistência e alta qualidade do output.
+* **Wireframes Detalhados:** Protótipos das telas de seleção de repositórios, chat e da nova sidebar de histórico.
+* **Estrutura de Dados para Chats:** Adição de modelos para armazenar o histórico de chats e Pull Requests no backend.
+* **Prompt Base e Template de Geração de PRs:** Refinamento do template base para garantir que as descrições geradas sejam mais personalizadas, claras e aderentes às práticas profissionais de desenvolvimento.
 
-### Sprint 3: Implementação de diferentes modelos e editor de template
+### Sprint 3: ISuporte a Múltiplos Modelos de IA e Editor de Template
 
-Faça uma descrição para essa sprint explicando como ela foi focada em dar acesso ao usuario de usar novos modelos como Deepseek e Grok fornecendo os tokens dessas aplicações e uma pagina de editor.html que permite editar a prompt de basePrompt.js para maior opções de costumização do usuario
+Nesta sprint, o foco foi oferecer aos usuários maior autonomia, permitindo o uso de diferentes modelos de IA (como DeepSeek e Grok) através da gestão de suas próprias chaves de API, além da criação de uma interface para personalização do template de geração dos Pull Requests.
 
 #### Objetivos da Sprint:
-* Adicione
+* Adicionar suporte ao uso de diferentes modelos de IA, além da OpenAI.
+* Permitir que os usuários cadastrem e gerenciem seus próprios tokens de API (GitHub, OpenAI, DeepSeek, Grok).
+* Disponibilizar uma interface que permite a edição do prompt utilizado na geração de descrições dos Pull Requests.
+* Oferecer maior flexibilidade e personalização no uso da plataforma.
 
 #### Funcionalidades Entregues:
 * **Página de Configurações do Usuário (`settings.html`):** Uma interface dedicada onde o usuário pode visualizar e atualizar suas informações de perfil (username e email), e principalmente, gerenciar seu token do GitHub e as chaves de API para diferentes modelos de IA (OpenAI, DeepSeek, Grok).
-* Adicione uma dessas para editor.html
+* **Editor de Prompt Personalizado (`editor.html`):** Ferramenta que permite aos usuários editar o conteúdo do `basePrompt.js` diretamente pela interface. Assim, é possível customizar o comportamento da IA, alterando o tom, a estrutura ou o nível de detalhamento das descrições geradas para os Pull Requests.
+
+#### Artefatos Criados:
+* **Wireframes do Editor e Configurações**: Protótipos para as novas telas de settings.html e editor.html.
+* **Estrutura de Dados Expandida**: Adição de campos para armazenar tokens dos diferentes modelos de IA e dados do prompt customizado de cada usuário.
+* **Template Dinâmico de Prompt**: Arquitetura que permite carregar, editar e salvar o prompt de cada usuário, proporcionando maior controle sobre a geração de textos pela IA.
