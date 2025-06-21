@@ -300,7 +300,7 @@ Esta sprint teve como foco aprimorar a navegação da aplicação, oferecer um h
 * **Estrutura de Dados para Chats:** Adição de modelos para armazenar o histórico de chats e Pull Requests no backend.
 * **Prompt Base e Template de Geração de PRs:** Refinamento do template base para garantir que as descrições geradas sejam mais personalizadas, claras e aderentes às práticas profissionais de desenvolvimento.
 
-### Sprint 3: ISuporte a Múltiplos Modelos de IA e Editor de Template
+### Sprint 3: Suporte a Múltiplos Modelos de IA e Editor de Template
 
 Nesta sprint, o foco foi oferecer aos usuários maior autonomia, permitindo o uso de diferentes modelos de IA (como DeepSeek e Grok) através da gestão de suas próprias chaves de API, além da criação de uma interface para personalização do template de geração dos Pull Requests.
 
