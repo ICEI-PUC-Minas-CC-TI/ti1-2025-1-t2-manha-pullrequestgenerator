@@ -39,9 +39,4 @@ function useState() {
 }
 
 
-window.useState = function () {
-  return {
-    getState: function (key) { ... },
-    setState: function (key, value) { ... }
-  }
-};
+window.useState = useState;
