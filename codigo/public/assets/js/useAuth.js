@@ -150,7 +150,7 @@ function useAuth() {
 
     if (now > expiration) {
       store.setState("session", null);
-      router.push("login.html");
+      router.push("index.html");
 
       return null;
     }
