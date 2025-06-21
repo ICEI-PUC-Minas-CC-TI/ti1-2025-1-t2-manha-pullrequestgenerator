@@ -101,7 +101,7 @@ Este PR implementa melhorias e novos recursos relacionados ao módulo de cartão
 
       // Carrega configurações salvas ou usa as padrão
       function loadConfig() {
-      const savedConfig = getState('config');
+      const savedConfig = getState('chatSettings');
     
       if (savedConfig) {
         $('#template').val(savedConfig.template);
@@ -110,10 +110,10 @@ Este PR implementa melhorias e novos recursos relacionados ao módulo de cartão
         $('#description_prompt').val(savedConfig.descriptionPrompt);
       } else {
         // Usa valores padrão se não houver configuração salva
-        $('#template').val(config.template);
-        $('#base_prompt').val(config.base_prompt);
-        $('#analysis_prompt').val(config.analysis_prompt);
-        $('#description_prompt').val(config.description_prompt);
+        $('#template').val(chatSettings.template);
+        $('#base_prompt').val(chatSettings.base_prompt);
+        $('#analysis_prompt').val(chatSettings.analysis_prompt);
+        $('#description_prompt').val(chatSettings.description_prompt);
       }
     }
 
@@ -142,7 +142,7 @@ Este PR implementa melhorias e novos recursos relacionados ao módulo de cartão
       e.preventDefault();
     
       const updated = {
-        id: getState('config')?.id || generateUniqueId(),
+        id: getState('chatSettings')?.id || generateUniqueId(),
         template: $('#template').val(),
         basePrompt: $('#base_prompt').val(),
         analysisPrompt: $('#analysis_prompt').val(),
@@ -151,9 +151,9 @@ Este PR implementa melhorias e novos recursos relacionados ao módulo de cartão
 
       try {
         // Salva no localStorage
-        setState('config', updated);
+        setState('chatSettings', updated);
       
-        // Salva no backend (db.json)
+        // Salva no db.json
         await saveToBackend(updated);
       
         console.log('Configuração salva com sucesso:', updated);
@@ -164,7 +164,7 @@ Este PR implementa melhorias e novos recursos relacionados ao módulo de cartão
       }
     });
 
-    // Função para salvar no backend (db.json)
+    // Função para salvar no db.json
     async function saveToBackend(configData) {
       const response = await fetch('http://localhost:3000/config', {
         method: 'PUT', // Ou 'POST' se for criação
