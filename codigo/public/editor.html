@@ -71,7 +71,17 @@
       </div>
 
       <!-- Botão de salvar -->
-      <div class="flex justify-end">
+      <div class="flex justify-between">
+        <div class="flex gap-3">
+          <button type="button" id="cancel-btn" class="text-gray-600 hover:text-gray-900 px-4 py-2 rounded transition">
+            Cancelar
+          </button>
+
+          <button type="button" id="reset-btn" class="text-gray-600 hover:text-gray-900 px-4 py-2 rounded transition">
+            Limpar
+          </button>
+        </div>
+
         <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
           Salvar Configuração
         </button>
@@ -120,6 +130,11 @@
         $('#template').removeClass('hidden');
         $('#edit-btn').addClass('hidden');
         $('#preview-btn').removeClass('hidden');
+      });
+
+      // Cancelar: volta para tela de chat
+      $('#cancel-btn').on('click', () => {
+        router.push("chat.html");
       });
 
       // Salvar
