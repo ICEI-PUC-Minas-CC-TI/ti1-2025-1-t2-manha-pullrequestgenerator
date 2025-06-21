@@ -318,3 +318,12 @@ Nesta sprint, o foco foi oferecer aos usuários maior autonomia, permitindo o us
 * **Wireframes do Editor e Configurações**: Protótipos para as novas telas de settings.html e editor.html.
 * **Estrutura de Dados Expandida**: Adição de campos para armazenar tokens dos diferentes modelos de IA e dados do prompt customizado de cada usuário.
 * **Template Dinâmico de Prompt**: Arquitetura que permite carregar, editar e salvar o prompt de cada usuário, proporcionando maior controle sobre a geração de textos pela IA.
+
+
+testes para integração multimodelos
+![alt text](/docs/image-31.png)
+a forma de passar o getmodel para o http de Ai estava errada
+problemas de integração
+erros desconhecidos de origem do github identificados como um erro de credencial do github
+caso use o githube e volte depos ira dar problema devido ao uso de uma variavel temporaria
+percebemos que nao possuimos um feedback de eero adequado
