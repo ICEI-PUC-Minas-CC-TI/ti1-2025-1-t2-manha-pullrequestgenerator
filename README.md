@@ -334,3 +334,10 @@ conclusões -> defeito de design encontrado, não há como retornar para essa pa
 resultado do teste 1 -> Suscetível a instabilidades do GitHub por ser dependente dele.
 
 conclusões -> risco baixo demais para ser considerável
+
+### testes de login e registro
+![alt text](/docs/image-32.png)
+resultado teste login -> sucesso
+resultado teste registro -> sucesso
+
+conclusões -> sem alterações necessárias
