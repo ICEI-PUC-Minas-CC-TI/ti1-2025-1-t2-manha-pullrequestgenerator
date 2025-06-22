@@ -202,17 +202,6 @@ Transitando para o desenvolvimento, o framework Scrum foi implementado para gere
 * Realizar ciclos contínuos de **planejamento, execução, revisão e adaptação**.
 * Facilitar o feedback constante e a evolução progressiva da solução, garantindo que o produto final estivesse alinhado com as expectativas e necessidades identificadas.
 
-### Divisão de Papéis e Responsabilidades
-
-A equipe foi estruturada com uma clara divisão de papéis, visando maximizar a eficiência, aproveitar as habilidades individuais e assegurar a cobertura integral dos requisitos do projeto:
-
-* **Filipe Augusto Silva Maia:** Liderança e desenvolvimento do **Módulo de Autenticação e Gerenciamento de Usuários**. Responsável por todas as interfaces e lógicas de login, registro e configurações da conta, assegurando a segurança e o controle de acesso à aplicação.
-* **Heitor Lima Moreira:** Especialização na **Integração com a API do GitHub**. Implementou a funcionalidade de listagem de organizações e repositórios, um componente fundamental para a interação do sistema com a plataforma de versionamento.
-* **Hector Faria Braz de Carvalho:** Foco na **Lógica de Comparação de Branches e Obtenção de Commits**. Seu trabalho foi crucial para extrair os dados precisos das alterações de código, que são a base para a análise da inteligência artificial.
-* **João Augusto Moreira Cunha:** Responsável pela **Interface de Chat**. Projetou e implementou a experiência do usuário do chat, garantindo que as descrições de Pull Request geradas pela IA fossem apresentadas de forma intuitiva e interativa.
-* **Luca Pinheiro Maciel Santos:** Arquitetura e implementação dos **Módulos de Gerenciamento de Estado e Roteamento**. Garantiu a persistência de dados no `localStorage` e a navegação fluida entre as páginas, essenciais para a coesão da aplicação.
-* **Matheus Procopio Duarte:** Desenvolvimento da **Integração com as APIs de Inteligência Artificial**. Sua contribuição foi indispensável para o *core* da solução, permitindo que a aplicação processasse os dados dos commits e gerasse as descrições de Pull Request de forma inteligente.
-
 ### Ferramentas Essenciais
 
 A seleção estratégica de ferramentas foi um pilar para a colaboração eficiente e o sucesso do desenvolvimento:
