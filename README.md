@@ -342,3 +342,24 @@ resultado teste login -> sucesso
 resultado teste registro -> sucesso
 
 conclusões -> sem alterações necessárias
+
+#### plano de testes:
+Nome do teste: Criação de conta
+Objetivo do teste: Verificar se o processo de criação de conta é concluído com sucesso.
+Realização: Clicar em "criar conta", fornecer o token do GitHub com autorização para ver email, escrever PR e olhar metadata e commit statuses.
+Resultado esperado: Criação da conta concluída, permitindo acesso ao resto do site.
+
+Nome do teste: Tela de edição de usuário
+Objetivo do teste: Verificar se a tela de edição do usuário funciona corretamente.
+Realização: Criar conta, clicar no avatar e verificar a edição e o impacto da edição do usuário.
+Resultado esperado: Abrir tela de configurações do usuário com opções de edição.
+
+Nome do teste: Api key
+Objetivo do teste: Verificar se a API Key é salva corretamente.
+Realização: Fornecer a API Key.
+Resultado esperado: API Key salva com sucesso.
+
+Nome do teste: Uso da api
+Objetivo do teste: Verificar se a API Key é utilizada corretamente.
+Realização: Testar o chat voltando para a tela inicial e clicando em "começar agora".
+Resultado esperado: API Key entra em uso.
