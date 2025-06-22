@@ -333,4 +333,4 @@ conclusões -> defeito de design encontrado, não há como retornar para essa pa
 ![alt text](/docs/image-30.png)
 resultado do teste 1 -> Suscetível a instabilidades do GitHub por ser dependente dele.
 
-conclusões -> 
+conclusões -> risco baixo demais para ser considerável
